@@ -8,11 +8,18 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.2.1",
+    "autoprefixer": "^10.0.4",
+    "axios": "^0.21.1",
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.11.13",
     "next": "latest",
+    "next-auth": "^3.1.0",
+    "next-connect": "^0.9.1",
+    "postcss": "^8.1.10",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "autoprefixer": "^10.0.4",
-    "postcss": "^8.1.10",
+    "swr": "^0.4.0",
     "tailwindcss": "^2.0.2"
   }
 }

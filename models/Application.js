@@ -19,8 +19,10 @@ const applicationSchema = new Schema({
   ],
   linkedinURL: String,
   resumeURL: String,
-  youtubeURL: String,
+  youtubeIntroductionURL: String,
   otherComments: String,
 });
 
-export const Application = mongoose.model('Application', applicationSchema);
+const Application = mongoose.model('Application', applicationSchema);
+
+export default Application;

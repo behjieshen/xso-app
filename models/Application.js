@@ -21,7 +21,8 @@ let applicationSchema = new Schema({
   resumeURL: String,
   youtubeIntroductionURL: String,
   otherComments: String,
-  createdOn: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  status: { type: Date, default: 'NEW APPLICATION' },
 });
 
 export default mongoose.models["Application"] ||

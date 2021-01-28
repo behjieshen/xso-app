@@ -16,15 +16,16 @@ const options = {
 
       try {
         await dbConnect();
-        let user = await User.findOne({ email });
-
+        console.log("------------------");
+        let user = await User.findOne({ email }).exec();
+        console.log(user);
         if (!user) {
-          user = new User({
+          const newUser = new User({
             name,
             email,
             image,
           });
-          await user.save();
+          await newUser.save();
         }
 
         return Promise.resolve(true);
@@ -37,8 +38,9 @@ const options = {
 
     session: async (session, user) => {
       try {
+        console.log("hello");
         await dbConnect();
-        let dbUser = await User.findOne({ email: session.user.email });
+        let dbUser = await User.findOne({ email: session.user.email }).exec();
         session.dbUser = dbUser;
         session.id = dbUser._id;
       } catch (err) {

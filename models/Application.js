@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 // ref link: https://forms.gle/yUjCGbLZwKrKdj698
-const applicationSchema = new Schema({
+let applicationSchema = new Schema({
   fullName: String,
   email: String,
   location: String,
@@ -21,8 +21,8 @@ const applicationSchema = new Schema({
   resumeURL: String,
   youtubeIntroductionURL: String,
   otherComments: String,
+  createdOn: { type: Date, default: Date.now }
 });
 
-const Application = mongoose.model('Application', applicationSchema);
-
-export default Application;
+export default mongoose.models["Application"] ||
+  mongoose.model("Application", applicationSchema, "applications");

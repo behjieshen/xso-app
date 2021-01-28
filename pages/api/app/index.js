@@ -1,16 +1,35 @@
-import Application from '../../../models/Application';
-import dbConnect from '../../../utils/mongodb';
+import { getSession } from "next-auth/client";
+import Application from "../../../models/Application";
+import dbConnect from "../../../utils/mongodb";
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    // Data validation
+  // Send in new application
+  if (req.method === "POST") {
     await dbConnect();
+
+    // TODO: Data validation
+
     const newApplication = new Application(req.body);
-
     await newApplication.save();
-
+    res.send("Application is successful");
   } else {
-    res.send('404 error');
+    const session = await getSession({ req });
+
+    // Check if user is logged in
+    if (!session) {
+      res.send("You are not logged in");
+    } else {
+      // Find application in database
+      let application = await Application.findOne({email: session.user.email}).exec();
+
+      // If no entry, ask them to fill in
+      // Else return application data
+      if(!application) {
+        res.send('no application')
+      } else {
+        res.send(application);
+      }
+    }
   }
 }
 

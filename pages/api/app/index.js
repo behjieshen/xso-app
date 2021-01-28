@@ -6,6 +6,9 @@ export default async function handler(req, res) {
   // Send in new application
   if (req.method === "POST") {
     await dbConnect();
+
+    // TODO: Data validation
+
     const newApplication = new Application(req.body);
     await newApplication.save();
     res.send("Application is successful");
@@ -16,9 +19,16 @@ export default async function handler(req, res) {
     if (!session) {
       res.send("You are not logged in");
     } else {
-      // find application in database
-      // if no entry, ask them to fill in
-      // else return
+      // Find application in database
+      let application = await Application.findOne({email: session.user.email}).exec();
+
+      // If no entry, ask them to fill in
+      // Else return application data
+      if(!application) {
+        res.send('no application')
+      } else {
+        res.send(application);
+      }
     }
   }
 }

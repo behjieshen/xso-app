@@ -38,7 +38,6 @@ const options = {
 
     session: async (session, user) => {
       try {
-        console.log("hello");
         await dbConnect();
         let dbUser = await User.findOne({ email: session.user.email }).exec();
         session.dbUser = dbUser;

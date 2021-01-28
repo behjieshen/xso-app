@@ -21,6 +21,7 @@ let applicationSchema = new Schema({
   resumeURL: String,
   youtubeIntroductionURL: String,
   otherComments: String,
+  createdOn: { type: Date, default: Date.now }
 });
 
 export default mongoose.models["Application"] ||

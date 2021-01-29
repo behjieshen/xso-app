@@ -1,13 +1,30 @@
-import { getSession } from "next-auth/client";
-import Application from "../../../models/Application";
+/**
+ * Route URL: /api/admin/export-applications
+ *
+ * [GET] - Download all applications data as csv
+ *
+ */
+
+import { Application } from "../../../models/Application";
 import dbConnect from "../../../utils/mongodb";
 import { Parser } from "json2csv";
 import moment from "moment";
+import { isAuthenticated } from "../../../utils/isAuthenticated";
 
 export default async function handler(req, res) {
-  // Send in new application
+  /**
+   * [GET] - Download all applications data as csv
+   *
+   * @return {file} 200 - .csv file
+   * @return {string} 404 - "Error"
+   */
   if (req.method === "GET") {
-    // TODO: Check if user is admin
+    // Check if user is admin
+    let isCorrectUser = await isAuthenticated(req, "ADMIN");
+    if (!isCorrectUser) {
+      res.status(404).send("Error");
+      return;
+    }
 
     await dbConnect();
 
@@ -60,11 +77,12 @@ export default async function handler(req, res) {
 
     // Send cav file back as attachment
     res.setHeader(
-      "Content-Disposition", `attachment;filename=${moment().format('MMDDYYYY')}_XSO_APPLICATIONS.csv`
+      "Content-Disposition",
+      `attachment;filename=${moment().format("MMDDYYYY")}_XSO_APPLICATIONS.csv`
     );
-    
-    res.send(csvData);
+
+    res.status(200).send(csvData);
   } else {
-    res.status(404);
+    res.status(404).send('Error');
   }
 }

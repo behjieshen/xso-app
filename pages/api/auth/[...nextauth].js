@@ -52,7 +52,7 @@ const options = {
   },
 
   // Enable debug messages in the console if you are having problems
-  debug: true,
+  debug: false,
 };
 
 export default (req, res) => NextAuth(req, res, options);

@@ -36,30 +36,40 @@ let validationSchema = yup.object().shape({
   email: yup.string().email().required(),
   location: yup.string().required(),
   cohort: yup.string().required(),
-  education: yup.object().shape({
-    school: yup.string().required(),
-    studentStatus: yup.string().required(),
-    universityMajor: yup.string().required(),
-  }).required(),
-  openQuestions: yup.array().of(
-    yup.object().shape({
-      question: yup.string().required(),
-      answer: yup.string().required(),
+  education: yup
+    .object()
+    .shape({
+      school: yup.string().required(),
+      studentStatus: yup.string().required(),
+      universityMajor: yup.string().required(),
     })
-  ).required(),
+    .required(),
+  openQuestions: yup
+    .array()
+    .of(
+      yup.object().shape({
+        question: yup.string().required(),
+        answer: yup.string().required(),
+      })
+    )
+    .required(),
   linkedinURL: yup.string().required().url(),
   resumeURL: yup.string().required().url(),
-  youtubeIntroductionURL: yup.string().required().url(), 
-  otherComments: yup.string().required(), 
+  youtubeIntroductionURL: yup.string().required().url(),
+  otherComments: yup.string().required(),
   createdAt: yup.date().default(function () {
     return new Date();
   }),
-  status: yup.mixed().oneOf(['NEW APPLICATION', 'ACCEPTED', 'REJECTED']).default(function () {
-    return "NEW APPLICATION";
-  })
+  status: yup
+    .mixed()
+    .oneOf(["NEW APPLICATION", "ACCEPTED", "REJECTED"])
+    .default(function () {
+      return "NEW APPLICATION";
+    }),
 });
 
-export {validationSchema};
+export { validationSchema };
 
-export const Application = mongoose.models["Application"] ||
-mongoose.model("Application", applicationSchema, "applications");
+export const Application =
+  mongoose.models["Application"] ||
+  mongoose.model("Application", applicationSchema, "applications");

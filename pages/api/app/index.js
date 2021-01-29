@@ -1,18 +1,32 @@
+/**
+ * Route URL: /api/app
+ * 
+ * [GET] - View complete application data if user is logged in and has applied
+ * [POST] - Submit new application
+ * 
+ */
+
 import { getSession } from "next-auth/client";
 import Application from "../../../models/Application";
 import dbConnect from "../../../utils/mongodb";
 
 export default async function handler(req, res) {
-  // Send in new application
+
   if (req.method === "POST") {
     await dbConnect();
 
     // TODO: Data validation
 
-    const newApplication = new Application(req.body);
-    await newApplication.save();
-    res.send("Application is successful");
-  } else {
+    try {
+      const newApplication = new Application(req.body);
+      await newApplication.save();
+      res.status(200).send("Application is successful");
+    } catch(err) {
+      console.log(err);
+      res.status(400).send("Error");
+    }
+
+  } else if (req.method === "GET") {
     const session = await getSession({ req });
 
     // Check if user is logged in
@@ -30,6 +44,8 @@ export default async function handler(req, res) {
         res.send(application);
       }
     }
+  } else {
+    res.status(404);
   }
 }
 

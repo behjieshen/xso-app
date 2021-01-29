@@ -22,7 +22,7 @@ let applicationSchema = new Schema({
   youtubeIntroductionURL: String,
   otherComments: String,
   createdAt: { type: Date, default: Date.now },
-  status: { type: Date, default: 'NEW APPLICATION' },
+  status: { type: String, enum: ["NEW APPLICATION", "ACCEPTED", "REJECTED"], default: "NEW APPLICATION" },
 });
 
 export default mongoose.models["Application"] ||

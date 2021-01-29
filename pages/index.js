@@ -1,4 +1,4 @@
-import MainLayout from "../Layout/MainLayout";
+import MainLayout from "../layout/MainLayout";
 
 export default function Index() {
   return (

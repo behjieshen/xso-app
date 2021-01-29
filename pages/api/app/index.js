@@ -1,24 +1,132 @@
-import Application from '../../../models/Application';
-import dbConnect from '../../../utils/mongodb';
+/**
+ * Route URL: /api/app
+ *
+ * [GET] - View completed application if user is logged in and has applied
+ * [POST] - Submit new application
+ *
+ */
+
+import { getSession } from "next-auth/client";
+import { Application, validationSchema } from "../../../models/Application";
+import dbConnect from "../../../utils/mongodb";
+import User from "../../../models/User";
+import { isAuthenticated } from '../../../utils/isAuthenticated'
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    // Data validation
+  /**
+   * [POST] - Submit new application
+   *
+   * @param {object} Application (refer to Application Model)
+   * @return {string} 200 - Application is successful
+   * @return {string} 400 - Error
+   */
+  if (req.method === "POST") {
     await dbConnect();
-    const newApplication = new Application(req.body);
 
-    await newApplication.save();
+    // Check if user is new user
+    const session = await getSession({ req });
+    let isCorrectUser = await isAuthenticated(req, "NEW USER");
+    if (!isCorrectUser) {
+      res.status(404).send("Error");
+      return;
+    }
 
+    // Check if user has submitted an application
+    let hasApplied;
+    try {
+      let application = await Application.findOne({
+        email: session.user.email,
+        // TODO: add cohort
+      }).lean();
+      if (application !== null) {
+        hasApplied = true;
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(400).send("Error");
+      return;
+    }
+
+    if (hasApplied) {
+      res.send("You have already submitted previously");
+      return;
+    }
+
+    // Data validation
+    let isDataValid = false;
+    try {
+      isDataValid = await validationSchema.validate(req.body);
+    } catch (err) {
+      let errValidationResponse = {
+        field: err.path,
+        message: err.errors[0],
+      };
+      res.status(400).send(errValidationResponse);
+      return;
+    }
+
+    // Save into database
+    if (isDataValid) {
+      try {
+        const newApplication = new Application(req.body);
+        await newApplication.save((err, application) => {
+          if (err) {
+            console.log(err);
+            res.send(400).send("Error");
+            return;
+          }
+        });
+      } catch (err) {
+        console.log(err);
+        res.status(400).send("Error");
+        return;
+      }
+
+      try {
+        await User.findOneAndUpdate(
+          { _id: session.dbUser._id },
+          { role: "APPLICANT" }
+        );
+      } catch (err) {
+        console.log(err);
+        res.status(400).send("Error");
+        return;
+      }
+
+      res.send("Application is successful");
+    }
+
+    /**
+     * [GET] - View completed application if user is has applied
+     *
+     * @return {object} 200 - {application}
+     * @return {object} 400 - {}
+     */
+  } else if (req.method === "GET") {
+    // Check if user is logged in
+    const session = await getSession({ req });
+    let isCorrectUser = await isAuthenticated(req, "APPLICANT");
+    if (!isCorrectUser) {
+      res.status(404).send({});
+      return;
+    }
+    // Find application in database
+    let application = await Application.findOne({
+      email: session.user.email,
+    }).lean();
+
+    res.status(200).send(application);
   } else {
-    res.send('404 error');
+    res.status(404);
   }
 }
 
 // Test json data
 // {
-//   "fullName": "Tommy",
-//   "email": "tom@gmail.com",
+//   "fullName": "Jason",
+//   "email": "behjieshen@gmail.com",
 //   "location": "New York",
+//   "cohort": "Fall 2020",
 //   "education": {
 //       "school": "University of Washington",
 //       "studentStatus": "Freshman",

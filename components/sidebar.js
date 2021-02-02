@@ -139,29 +139,6 @@ export default function Sidebar() {
           <nav className="px-3 mt-6">
             <div className="space-y-1">
               {/* <!-- Current: "bg-gray-200 text-gray-900", Default: "text-gray-700 hover:text-gray-900 hover:bg-gray-50" --> */}
-
-              <a
-                href="#"
-                className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-              >
-                {/* <!-- Heroicon name: view-list --> */}
-                <svg
-                  className="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                  />
-                </svg>
-                Application
-              </a>
             </div>
           </nav>
         </div>

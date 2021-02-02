@@ -1,6 +1,6 @@
 import MainLayout from "../layout/MainLayout";
-import Status from "../components/Status";
-export default function Index() {
+import XSOForm from "../components/XSOForm";
+export default function Form() {
   return (
     <div className="flex flex-col w-0 flex-1 overflow-hidden">
       {/* <!-- Search header --> */}
@@ -153,14 +153,14 @@ export default function Index() {
         <div className="border-b border-gray-200 px-4 py-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-medium leading-6 text-gray-900 sm:truncate">
-              Home
+              Application
             </h1>
           </div>
         </div>
-        <Status />
+        <XSOForm />
       </main>
     </div>
   );
 }
 
-Index.Layout = MainLayout;
+Form.Layout = MainLayout;

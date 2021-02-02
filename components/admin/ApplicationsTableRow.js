@@ -3,12 +3,17 @@ import { Transition } from "@headlessui/react";
 import axios from "axios";
 import useSWR, { mutate } from "swr";
 
-export default function ApplicationsTableRow({ data: application, index }) {
+export default function ApplicationsTableRow({
+  data: application,
+  index,
+  setDetailViewData,
+  setShowDetailView,
+}) {
   const {
     fullName,
     education: { school, studentStatus, universityMajor },
     status,
-    _id: id
+    _id: id,
   } = application;
 
   const [activeAcceptButton, setActiveAcceptButton] = useState(
@@ -18,12 +23,14 @@ export default function ApplicationsTableRow({ data: application, index }) {
     status === "REJECTED"
   );
 
-  const updateStatusFetcher = url => axios.put(url).then(res => res.application)
-
-  const [showDropdown, setShowDropdown] = useState(false);
-
   return (
-    <tr className="px-6 cursor-pointer hover:bg-gray-100">
+    <tr
+      className="px-6 cursor-pointer hover:bg-gray-100"
+      onClick={() => {
+        setDetailViewData(application);
+        setShowDetailView(true);
+      }}
+    >
       <td className="pl-6 py-3 px-2 text-sm text-gray-500 font-medium">
         {index + 1}
       </td>
@@ -42,15 +49,15 @@ export default function ApplicationsTableRow({ data: application, index }) {
       </td>
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left flex">
         <button
-          onClick={async() => {
-            await setActiveAcceptButton(true);
-            await setActiveRejectButton(false);
+          onClick={async (e) => {
+            e.stopPropagation();
+            setActiveAcceptButton(true);
+            setActiveRejectButton(false);
             try {
-              await axios
-              .put(`/api/admin/app/${id}/accept`)
+              await axios.put(`/api/admin/app/${id}/accept`);
               await mutate("/api/admin/app");
-            } catch(err) {
-              console.log(err)
+            } catch (err) {
+              console.log(err);
             }
           }}
           type="submit"
@@ -63,15 +70,15 @@ export default function ApplicationsTableRow({ data: application, index }) {
           Accept
         </button>
         <button
-          onClick={async () => {
-            await setActiveAcceptButton(false);
-            await setActiveRejectButton(true);
+          onClick={async (e) => {
+            e.stopPropagation();
+            setActiveAcceptButton(false);
+            setActiveRejectButton(true);
             try {
-              await axios
-              .put(`/api/admin/app/${id}/reject`)
+              await axios.put(`/api/admin/app/${id}/reject`);
               await mutate("/api/admin/app");
-            } catch(err) {
-              console.log(err)
+            } catch (err) {
+              console.log(err);
             }
           }}
           type="submit"
@@ -84,7 +91,7 @@ export default function ApplicationsTableRow({ data: application, index }) {
           Reject
         </button>
       </td>
-      <td className="pr-6">
+      <td className="pr-6 cursor-pointer">
         <div className="relative flex justify-end items-center text-xxs text-gray-400 font-medium">
           <svg
             className="w-5 h-5 bg-transparent inline-flex items-center justify-center text-gray-400 rounded-full hover:text-gray-500 focus:outline-none"

@@ -1,4 +1,6 @@
 export default function BasicStats({data, title, subtitle, bgClass}) {
+
+
     return (
         <li className="relative col-span-1 flex shadow-sm rounded-md">
         <div className={`flex-shrink-0 flex items-center justify-center w-16 text-white text-base font-medium rounded-l-md ${bgClass ? bgClass : 'bg-gray-600'}`}>

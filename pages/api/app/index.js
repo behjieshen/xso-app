@@ -27,8 +27,7 @@ export default async function handler(req, res) {
     const session = await getSession({ req });
     let isCorrectUser = await isAuthenticated(req, "NEW USER");
     if (!isCorrectUser) {
-      res.status(404).send("Error");
-      return;
+      return res.status(401)
     }
 
     // Check if user has submitted an application
@@ -149,5 +148,6 @@ export default async function handler(req, res) {
 //   "linkedinURL": "https://linkedin.com/",
 //   "resumeURL": "https://resume.com/",
 //   "youtubeIntroductionURL": "https://youtube.com/",
-//   "otherComments": "I love whales."
+//   "otherComments": "I love whales.",
+//   "status": "NEW APPLICATION"
 // }

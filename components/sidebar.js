@@ -75,13 +75,11 @@ export default function Sidebar() {
               leave="transition ease-in duration-75"
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
+              className="z-50 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="options-menu"
             >
-              <div
-                className="z-50 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="options-menu"
-              >
                 <div className="py-1">
                   <a
                     href="#"
@@ -130,7 +128,6 @@ export default function Sidebar() {
                     Logout
                   </a>
                 </div>
-              </div>
             </Transition>
           </div>
 

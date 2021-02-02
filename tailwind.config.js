@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         blueGray: colors.blueGray,
         coolGray: colors.coolGray,
+        amber: colors.amber,
       },
       fontSize: {
         'xxs': '.70rem',

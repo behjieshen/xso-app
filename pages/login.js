@@ -4,7 +4,7 @@ import Router from "next/router";
 export default function Login() {
   const [session] = useSession();
 
-  if (session) Router.push("/");
+  // if (session) Router.push("/");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -10,8 +10,6 @@ import { getSession } from "next-auth/client";
 export const isAuthenticated = async (req, role) => {
     const session = await getSession({ req });
 
-    console.log(session);
-
     if (!session || (session != null && session.dbUser.role !== role)) {
         return false
     }  

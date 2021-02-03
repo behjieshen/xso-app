@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
+import { useCurrentUser } from "../hooks/index";
+import { signOut } from "next-auth/client";
+
 export default function Sidebar() {
   const [settingVisible, setSettingVisible] = useState(false);
+  const [user, { mutate }] = useCurrentUser();
+  const onSignout = () => {
+    mutate(null, false);
+    signOut({ callbackUrl: process.env.SIGN_OUT_URL });
+  };
 
   return (
     <div className="hidden lg:flex lg:flex-shrink-0">
@@ -28,16 +36,20 @@ export default function Sidebar() {
               >
                 <span className="flex w-full justify-between items-center">
                   <span className="flex min-w-0 items-center justify-between space-x-3">
-                    <img
-                      className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
-                      src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80"
-                      alt=""
-                    />
-                    <span className="flex-1 min-w-0">
-                      <span className="text-gray-900 text-sm font-medium truncate">
-                        Jessy Schwarz
-                      </span>
-                    </span>
+                    {user && (
+                      <>
+                        <img
+                          className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+                          src={user.image}
+                          alt=""
+                        />
+                        <span className="flex-1 min-w-0">
+                          <span className="text-gray-900 text-sm font-medium truncate">
+                            {user.name}
+                          </span>
+                        </span>
+                      </>
+                    )}
                   </span>
                   {/* <!-- Heroicon name: selector --> */}
                   <svg
@@ -82,7 +94,7 @@ export default function Sidebar() {
                 aria-orientation="vertical"
                 aria-labelledby="options-menu"
               >
-                <div className="py-1">
+                {/* <div className="py-1">
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -104,28 +116,12 @@ export default function Sidebar() {
                   >
                     Notifications
                   </a>
-                </div>
+                </div> */}
                 <div className="py-1">
                   <a
+                    onClick={() => onSignout()}
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Get desktop app
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Support
-                  </a>
-                </div>
-                <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
                   >
                     Logout
                   </a>

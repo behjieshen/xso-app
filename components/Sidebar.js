@@ -9,7 +9,7 @@ export default function Sidebar({ image, name }) {
   const [_, { mutate }] = useCurrentUser();
   const onSignout = () => {
     mutate(null, false);
-    signOut({ callbackUrl: process.env.SIGN_OUT_URL });
+    signOut({ callbackUrl: process.env.NEXTAUTH_URL });
   };
 
   return (

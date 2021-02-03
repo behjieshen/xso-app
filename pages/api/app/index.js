@@ -10,7 +10,7 @@ import { getSession } from "next-auth/client";
 import { Application, validationSchema } from "../../../models/Application";
 import dbConnect from "../../../utils/mongodb";
 import User from "../../../models/User";
-import { isAuthenticated } from '../../../utils/isAuthenticated'
+import { isAuthenticated } from "../../../utils/isAuthenticated";
 
 export default async function handler(req, res) {
   /**
@@ -23,13 +23,11 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     await dbConnect();
 
-
-
     // Check if user is new user
     const session = await getSession({ req });
     let isCorrectUser = await isAuthenticated(req, "NEW USER");
     if (!isCorrectUser) {
-      return res.status(401)
+      return res.status(401);
     }
 
     // Check if user has submitted an application
@@ -47,7 +45,7 @@ export default async function handler(req, res) {
       return;
     }
 
-    console.log(req.body)
+    console.log(req.body);
 
     // Data validation
     let isDataValid = false;

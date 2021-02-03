@@ -1,5 +1,7 @@
 import moment from "moment";
 import { useSession } from "next-auth/client";
+import { useState } from "react";
+import useSWR, { mutate } from "swr";
 import {
   IoLogoLinkedin,
   IoLogoYoutube,
@@ -7,21 +9,33 @@ import {
   IoChevronForward,
   IoChevronBackSharp,
 } from "react-icons/io5";
+import axios from "axios";
 
 export default function DetailedView({ data, setShowDetailView }) {
-  console.log(data);
   const [session, loading] = useSession();
 
   if (!loading && !session) return <div>Error</div>;
 
-  const { image } = session.user;
+  const [activeAcceptButton, setActiveAcceptButton] = useState(
+    data.status === "ACCEPTED"
+  );
+  const [activeRejectButton, setActiveRejectButton] = useState(
+    data.status === "REJECTED"
+  );
+
+  const [hasUsedCTA, setHasUsedCTA] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-auto">
       <main className="pb-10 pt-6">
         <span
-          class="flex items-center font-medium text-base text-gray-600 lg:mx-8 mb-4 cursor-pointer"
-          onClick={() => setShowDetailView(false)}
+          className="flex items-center font-medium text-base text-gray-600 lg:mx-8 mb-4 cursor-pointer"
+          onClick={async () => {
+            if(hasUsedCTA) {
+              await mutate("/api/admin/app");
+            }
+            await setShowDetailView(false);
+          }}
         >
           <IoChevronBackSharp className="h-5 w-5 mr-1" />
           Back
@@ -31,7 +45,7 @@ export default function DetailedView({ data, setShowDetailView }) {
           <div className="flex items-center space-x-5">
             <div className="flex-shrink-0">
               <div className="relative">
-                <img className="h-16 w-16 rounded-full" src={image} />
+                <img className="h-16 w-16 rounded-full" src={data.image} />
                 <span
                   className="absolute inset-0 shadow-inner rounded-full"
                   aria-hidden="true"
@@ -50,9 +64,20 @@ export default function DetailedView({ data, setShowDetailView }) {
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
             <button
-              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                setActiveAcceptButton(true);
+                setActiveRejectButton(false);
+                try {
+                  await axios.put(`/api/admin/app/${data._id}/accept`);
+                  await setHasUsedCTA(true);
+                } catch (err) {
+                  console.log(err);
+                }
+              }}
+              type="submit"
               className={`w-full inline-flex items-center justify-center px-3 py-1 border border-transparent shadow-sm font-medium rounded-md text-white ${
-                true
+                activeAcceptButton
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-300 hover:bg-gray-400"
               } focus:outline-none sm:mt-0 sm:w-auto sm:text-sm`}
@@ -60,12 +85,23 @@ export default function DetailedView({ data, setShowDetailView }) {
               Accept
             </button>
             <button
-              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                setActiveAcceptButton(false);
+                setActiveRejectButton(true);
+                try {
+                  await axios.put(`/api/admin/app/${data._id}/reject`);
+                  await setHasUsedCTA(true);
+                } catch (err) {
+                  console.log(err);
+                }
+              }}
+              type="submit"
               className={`w-full inline-flex items-center justify-center px-3 py-1 border border-transparent shadow-sm font-medium rounded-md text-white ${
-                false
+                activeRejectButton
                   ? "bg-red-600 hover:bg-red-700"
                   : "bg-gray-300 hover:bg-gray-400"
-              } focus:outline-none sm:mt-0 sm:w-auto sm:text-sm`}
+              } focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
             >
               Reject
             </button>
@@ -206,7 +242,7 @@ export default function DetailedView({ data, setShowDetailView }) {
               </h2>
 
               {data.openQuestions.map((response, index) => (
-                <div className="sm:col-span-2 mt-5">
+                <div key={response.question} className="sm:col-span-2 mt-5">
                   <dt className="text-sm font-medium text-gray-500">
                     {index + 1}. {response.question}
                   </dt>

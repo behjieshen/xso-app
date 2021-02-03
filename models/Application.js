@@ -29,6 +29,7 @@ let applicationSchema = new Schema({
     enum: ["NEW APPLICATION", "ACCEPTED", "REJECTED"],
     default: "NEW APPLICATION",
   },
+  image: String,
 });
 
 let validationSchema = yup.object().shape({
@@ -66,6 +67,7 @@ let validationSchema = yup.object().shape({
     .default(function () {
       return "NEW APPLICATION";
     }),
+  image: yup.string().required().url(),
 });
 
 export { validationSchema };

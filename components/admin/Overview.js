@@ -17,7 +17,7 @@ export default function Overview({overviewData}) {
           data={overviewData.unlabelled}
           title="Unlabelled"
           subtitle={`${
-            (overviewData.unlabelled / overviewData.total) * 100
+            ((overviewData.unlabelled / overviewData.total) * 100).toFixed(2)
           }% left`}
           bgClass="bg-yellow-400"
         />
@@ -25,7 +25,7 @@ export default function Overview({overviewData}) {
           data={overviewData.rejected}
           title="Rejected"
           subtitle={`${
-            (overviewData.rejected / overviewData.total) * 100
+            ((overviewData.rejected / overviewData.total) * 100).toFixed(2)
           }% of applications`}
           bgClass="bg-red-600"
         />
@@ -33,7 +33,7 @@ export default function Overview({overviewData}) {
           data={overviewData.accepted}
           title="Accepted"
           subtitle={`${
-            (overviewData.accepted / overviewData.total) * 100
+            ((overviewData.accepted / overviewData.total) * 100).toFixed(2)
           }% of applications`}
           bgClass="bg-green-600"
         />

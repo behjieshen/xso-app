@@ -1,6 +1,6 @@
 import moment from "moment";
 import { useSession } from "next-auth/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import {
   IoLogoLinkedin,
@@ -24,6 +24,10 @@ export default function DetailedView({ data, setShowDetailView }) {
   );
 
   const [hasUsedCTA, setHasUsedCTA] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-auto">

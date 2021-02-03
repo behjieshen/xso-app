@@ -13,21 +13,15 @@ import Overview from "../../components/admin/Overview";
 
 export default function Index() {
   const [session, loading] = useSession();
-
-  let data = [];
-  let error;
-
-  const { data: applicationData, error: applicationError } = useSWR(
+  
+  const { data, error } = useSWR(
     "/api/admin/app",
     {
       revalidateOnFocus: true,
     }
   );
-  data = applicationData;
-  error = applicationError;
 
   if (!loading && session) {
-    console.log(session);
     if (session.dbUser.role !== "ADMIN") {
       Router.push(process.env.NEXTAUTH_URL + "/");
     }

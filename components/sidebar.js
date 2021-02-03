@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
-export default function Sidebar() {
+import { signOut } from "next-auth/client";
+
+export default function Sidebar({image, name}) {
   const [settingVisible, setSettingVisible] = useState(false);
 
   return (
@@ -8,10 +10,11 @@ export default function Sidebar() {
       <div className="flex flex-col w-64 border-r border-gray-200 pt-5 pb-4 bg-gray-100">
         <div className="flex items-center flex-shrink-0 px-6">
           <img
-            className="h-8 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-logo-purple-500-mark-gray-700-text.svg"
+            className="h-10 w-auto"
+            src="/images/xoogler-logo.png"
             alt="Workflow"
           />
+          <span className="ml-3 font-bold">Xoogler School</span>
         </div>
         {/* <!-- Sidebar component, swap this element with another sidebar if you like --> */}
         <div className="h-0 flex-1 flex flex-col overflow-y-auto">
@@ -30,12 +33,12 @@ export default function Sidebar() {
                   <span className="flex min-w-0 items-center justify-between space-x-3">
                     <img
                       className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
-                      src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80"
+                      src={image}
                       alt=""
                     />
                     <span className="flex-1 min-w-0">
                       <span className="text-gray-900 text-sm font-medium truncate">
-                        Jessy Schwarz
+                        {name}
                       </span>
                     </span>
                   </span>
@@ -80,7 +83,7 @@ export default function Sidebar() {
               aria-orientation="vertical"
               aria-labelledby="options-menu"
             >
-                <div className="py-1">
+                {/* <div className="py-1">
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -118,15 +121,15 @@ export default function Sidebar() {
                   >
                     Support
                   </a>
-                </div>
+                </div> */}
                 <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  <span
+                    className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     role="menuitem"
+                    onClick={() => signOut()}
                   >
                     Logout
-                  </a>
+                  </span>
                 </div>
             </Transition>
           </div>

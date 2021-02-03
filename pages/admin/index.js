@@ -70,7 +70,7 @@ export default function Index() {
     );
   else {
     return (
-      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+      <div className="flex flex-col w-0 flex-1">
         <main
           className="flex-1 relative z-0 overflow-y-auto focus:outline-none"
           tabIndex="0"

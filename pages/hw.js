@@ -1,3 +1,3 @@
 export default function HW() {
-  return <h1>Hello</h1>;
+  return <h1>Test</h1>;
 }

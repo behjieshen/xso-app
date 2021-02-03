@@ -22,8 +22,7 @@ export default async function handler(req, res) {
     // Check if user is admin
     let isCorrectUser = await isAuthenticated(req, "ADMIN");
     if (!isCorrectUser) {
-      res.status(404).send("Error");
-      return;
+      return res.status(401)
     }
 
     await dbConnect();
@@ -46,6 +45,7 @@ export default async function handler(req, res) {
         youtubeIntroductionURL,
         otherComments,
         createdAt,
+        status
       } = application;
 
       // Set custom column title in excel
@@ -61,6 +61,7 @@ export default async function handler(req, res) {
         "Self-Introduction Youtube URL": youtubeIntroductionURL,
         "Other Comments": otherComments,
         "Submission Date": moment(createdAt).format("MMMM Do YYYY, hh:mm:ss Z"),
+        "Application Status": status
       };
 
       // Add each set of open ended questions and answers
@@ -83,6 +84,6 @@ export default async function handler(req, res) {
 
     res.status(200).send(csvData);
   } else {
-    res.status(404).send('Error');
+    res.status(404).send("Error");
   }
 }

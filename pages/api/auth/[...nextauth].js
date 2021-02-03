@@ -16,9 +16,7 @@ const options = {
 
       try {
         await dbConnect();
-        console.log("------------------");
         let user = await User.findOne({ email }).exec();
-        console.log(user);
         if (!user) {
           const newUser = new User({
             name,

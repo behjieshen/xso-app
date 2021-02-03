@@ -1,18 +1,80 @@
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
-export default function Sidebar() {
+import { signOut } from "next-auth/client";
+import { useCurrentUser } from "../hooks/index";
+
+export default function Sidebar({ image, name }) {
   const [settingVisible, setSettingVisible] = useState(false);
+  const [sideNavVisible, setSideNavVisible] = useState(true);
+  const [_, { mutate }] = useCurrentUser();
+  const onSignout = () => {
+    mutate(null, false);
+    signOut({ callbackUrl: process.env.SIGN_OUT_URL });
+  };
 
   return (
-    <div className="hidden lg:flex lg:flex-shrink-0">
-      <div className="flex flex-col w-64 border-r border-gray-200 pt-5 pb-4 bg-gray-100">
-        <div className="flex items-center flex-shrink-0 px-6">
+    <Transition
+      show={true}
+      enter="transition ease-in-out duration-300 transform"
+      enterFrom="-translate-x-full"
+      enterTo="translate-x-0"
+      leave="transition ease-in-out duration-300 transform"
+      leaveFrom="translate-x-0"
+      leaveTo="-translate-x-full"
+      className="hidden lg:flex lg:flex-shrink-0 sticky top-0 h-screen"
+    >
+      {/* <div className="hidden lg:flex lg:flex-shrink-0 sticky top-0 h-screen"> */}
+      <div
+        className={`${
+          sideNavVisible ? null : "items-center"
+        } flex flex-col border-r border-gray-200 pt-5 pb-4 bg-gray-100`}
+      >
+        <div className="flex items-center flex-shrink-0 px-4">
           <img
-            className="h-8 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-logo-purple-500-mark-gray-700-text.svg"
+            className="h-10 w-auto"
+            src="/images/xoogler-logo.png"
             alt="Workflow"
           />
+          <span
+            className={`${sideNavVisible ? null : "hidden"} ml-3 font-bold`}
+          >
+            Xoogler School
+          </span>
+          <svg
+            className={`${
+              sideNavVisible ? null : "hidden"
+            } flex-shrink-0 h-5 w-5 text-gray-400 hover:text-gray-500 ml-5 cursor-pointer`}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            onClick={() => setSideNavVisible(!sideNavVisible)}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
         </div>
+        <svg
+          className={`${
+            !sideNavVisible ? null : "hidden"
+          } flex-shrink-0 h-6 w-6 mt-5 text-gray-500 group-hover:text-gray-500 cursor-pointer`}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          onClick={() => setSideNavVisible(!sideNavVisible)}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
         {/* <!-- Sidebar component, swap this element with another sidebar if you like --> */}
         <div className="h-0 flex-1 flex flex-col overflow-y-auto">
           {/* <!-- User account dropdown --> */}
@@ -21,21 +83,24 @@ export default function Sidebar() {
             <div>
               <button
                 type="button"
-                className="group w-full bg-gray-100 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
+                className={`${
+                  sideNavVisible ? null : "hidden"
+                } group w-full bg-gray-100 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500`}
                 id="options-menu"
                 aria-haspopup="true"
                 aria-expanded="true"
+                onClick={() => setSettingVisible(!settingVisible)}
               >
                 <span className="flex w-full justify-between items-center">
                   <span className="flex min-w-0 items-center justify-between space-x-3">
                     <img
                       className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
-                      src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80"
+                      src={image}
                       alt=""
                     />
                     <span className="flex-1 min-w-0">
                       <span className="text-gray-900 text-sm font-medium truncate">
-                        Jessy Schwarz
+                        {name}
                       </span>
                     </span>
                   </span>
@@ -46,7 +111,6 @@ export default function Sidebar() {
                     viewBox="0 0 20 20"
                     fill="currentColor"
                     aria-hidden="true"
-                    onClick={() => setSettingVisible(!settingVisible)}
                   >
                     <path
                       fillRule="evenodd"
@@ -75,14 +139,12 @@ export default function Sidebar() {
               leave="transition ease-in duration-75"
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
+              className="z-50 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="options-menu"
             >
-              <div
-                className="z-50 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="options-menu"
-              >
-                <div className="py-1">
+              {/* <div className="py-1">
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -104,32 +166,15 @@ export default function Sidebar() {
                   >
                     Notifications
                   </a>
-                </div>
-                <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Get desktop app
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Support
-                  </a>
-                </div>
-                <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Logout
-                  </a>
-                </div>
+                </div> */}
+              <div className="py-1">
+                <a
+                  onClick={() => onSignout()}
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  Logout
+                </a>
               </div>
             </Transition>
           </div>
@@ -143,6 +188,6 @@ export default function Sidebar() {
           </nav>
         </div>
       </div>
-    </div>
+    </Transition>
   );
 }

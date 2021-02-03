@@ -9,6 +9,7 @@ export default function MainLayout({ children }) {
   if (!session && !loading) {
     Router.push(process.env.NEXTAUTH_URL + "login");
   }
+  //redirect
 
   return (
     <>

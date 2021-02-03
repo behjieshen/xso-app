@@ -18,7 +18,6 @@ export default function MainLayout({ children }) {
           <MobileSideBar />
           {/* <!-- Static sidebar for desktop --> */}
           <Sidebar image={session.user.image} name={session.user.name} />
-          <h1>Test</h1>
           {children}
         </div>
       )}

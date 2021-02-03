@@ -9,7 +9,6 @@ export default function MainLayout({ children }) {
   if (!session && !loading) {
     Router.push(process.env.NEXTAUTH_URL + "login");
   }
-  //redirect
 
   return (
     <>
@@ -19,7 +18,7 @@ export default function MainLayout({ children }) {
           <MobileSideBar />
           {/* <!-- Static sidebar for desktop --> */}
           <Sidebar image={session.user.image} name={session.user.name} />
-
+          <h1>Test</h1>
           {children}
         </div>
       )}

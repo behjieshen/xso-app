@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { signOut } from "next-auth/client";
+import { useCurrentUser } from "../hooks/index";
+import { signOut } from "next-auth/client";
 
 export default function Sidebar({ image, name }) {
   const [settingVisible, setSettingVisible] = useState(false);
   const [sideNavVisible, setSideNavVisible] = useState(true);
+  const [{ mutate }] = useCurrentUser();
+  const onSignout = () => {
+    mutate(null, false);
+    signOut({ callbackUrl: process.env.SIGN_OUT_URL });
+  };
 
   return (
     <Transition
@@ -18,9 +25,11 @@ export default function Sidebar({ image, name }) {
       className="hidden lg:flex lg:flex-shrink-0 sticky top-0 h-screen"
     >
       {/* <div className="hidden lg:flex lg:flex-shrink-0 sticky top-0 h-screen"> */}
-      <div className={`${
-              sideNavVisible ? null : "items-center"
-            } flex flex-col border-r border-gray-200 pt-5 pb-4 bg-gray-100`}>
+      <div
+        className={`${
+          sideNavVisible ? null : "items-center"
+        } flex flex-col border-r border-gray-200 pt-5 pb-4 bg-gray-100`}
+      >
         <div className="flex items-center flex-shrink-0 px-4">
           <img
             className="h-10 w-auto"
@@ -51,22 +60,22 @@ export default function Sidebar({ image, name }) {
           </svg>
         </div>
         <svg
-            className={`${
-              !sideNavVisible ? null : "hidden"
-            } flex-shrink-0 h-6 w-6 mt-5 text-gray-500 group-hover:text-gray-500 cursor-pointer`}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            onClick={() => setSideNavVisible(!sideNavVisible)}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          className={`${
+            !sideNavVisible ? null : "hidden"
+          } flex-shrink-0 h-6 w-6 mt-5 text-gray-500 group-hover:text-gray-500 cursor-pointer`}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          onClick={() => setSideNavVisible(!sideNavVisible)}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
         {/* <!-- Sidebar component, swap this element with another sidebar if you like --> */}
         <div className="h-0 flex-1 flex flex-col overflow-y-auto">
           {/* <!-- User account dropdown --> */}
@@ -158,31 +167,15 @@ export default function Sidebar({ image, name }) {
                   >
                     Notifications
                   </a>
-                </div>
-                <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Get desktop app
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Support
-                  </a>
                 </div> */}
               <div className="py-1">
-                <span
-                  className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  role="menuitem"
-                  onClick={() => signOut()}
+                <a
+                  onClick={() => onSignout()}
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 >
                   Logout
-                </span>
+                </a>
               </div>
             </Transition>
           </div>

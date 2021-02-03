@@ -1,5 +1,5 @@
 module.exports = {
   env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    SIGN_OUT_URL: process.env.SIGN_OUT_URL,
   },
 };

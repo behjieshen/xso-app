@@ -7,7 +7,7 @@ export default function MainLayout({ children }) {
   const [session, loading] = useSession();
 
   if (!session && !loading) {
-    Router.push(process.env.NEXTAUTH_URL + "/login");
+    Router.push(process.env.NEXTAUTH_URL + "login");
   }
 
   return (

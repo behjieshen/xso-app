@@ -8,6 +8,7 @@ export default function ApplicationsTableRow({
   index,
   setDetailViewData,
   setShowDetailView,
+  updateOverview,
 }) {
   const {
     fullName,
@@ -51,11 +52,11 @@ export default function ApplicationsTableRow({
         <button
           onClick={async (e) => {
             e.stopPropagation();
+            updateOverview('accepted', status === 'NEW APPLICATION');
             setActiveAcceptButton(true);
             setActiveRejectButton(false);
             try {
               await axios.put(`/api/admin/app/${id}/accept`);
-              await mutate("/api/admin/app");
             } catch (err) {
               console.log(err);
             }
@@ -72,11 +73,11 @@ export default function ApplicationsTableRow({
         <button
           onClick={async (e) => {
             e.stopPropagation();
+            updateOverview('rejected', status === 'NEW APPLICATION');
             setActiveAcceptButton(false);
             setActiveRejectButton(true);
             try {
               await axios.put(`/api/admin/app/${id}/reject`);
-              await mutate("/api/admin/app");
             } catch (err) {
               console.log(err);
             }

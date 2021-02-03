@@ -11,7 +11,7 @@ import {
 } from "react-icons/io5";
 import axios from "axios";
 
-export default function DetailedView({ data, setShowDetailView }) {
+export default function DetailedView({ data, setShowDetailView, updateOverview }) {
   const [session, loading] = useSession();
 
   if (!loading && !session) return <div>Error</div>;
@@ -30,15 +30,12 @@ export default function DetailedView({ data, setShowDetailView }) {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-auto">
+    <div className="min-h-screen bg-gray-100 overflow-auto w-full">
       <main className="pb-10 pt-6">
         <span
           className="flex items-center font-medium text-base text-gray-600 lg:mx-8 mb-4 cursor-pointer"
-          onClick={async () => {
-            if(hasUsedCTA) {
-              await mutate("/api/admin/app");
-            }
-            await setShowDetailView(false);
+          onClick={() => {
+            setShowDetailView(false);
           }}
         >
           <IoChevronBackSharp className="h-5 w-5 mr-1" />
@@ -70,11 +67,11 @@ export default function DetailedView({ data, setShowDetailView }) {
             <button
               onClick={async (e) => {
                 e.stopPropagation();
-                setActiveAcceptButton(true);
-                setActiveRejectButton(false);
+                updateOverview('accepted', status === 'NEW APPLICATION');
+                setActiveAcceptButton(false);
+                setActiveRejectButton(true);
                 try {
-                  await axios.put(`/api/admin/app/${data._id}/accept`);
-                  await setHasUsedCTA(true);
+                  await axios.put(`/api/admin/app/${id}/accepted`);
                 } catch (err) {
                   console.log(err);
                 }
@@ -91,11 +88,11 @@ export default function DetailedView({ data, setShowDetailView }) {
             <button
               onClick={async (e) => {
                 e.stopPropagation();
+                updateOverview('rejected', status === 'NEW APPLICATION');
                 setActiveAcceptButton(false);
                 setActiveRejectButton(true);
                 try {
-                  await axios.put(`/api/admin/app/${data._id}/reject`);
-                  await setHasUsedCTA(true);
+                  await axios.put(`/api/admin/app/${id}/reject`);
                 } catch (err) {
                   console.log(err);
                 }

@@ -13,13 +13,38 @@ import Overview from "../../components/admin/Overview";
 
 export default function Index() {
   const [session, loading] = useSession();
-  
-  const { data, error } = useSWR(
-    "/api/admin/app",
-    {
-      revalidateOnFocus: true,
+
+  const fetcher = (url) =>
+    axios.get(url).then((res) => {
+      let overviewData = {
+        accepted: 0,
+        rejected: 0,
+        unlabelled: 0,
+        total: 0,
+      };
+      res.data.map((application) => {
+        if (application.status === "REJECTED") overviewData.rejected += 1;
+        if (application.status === "ACCEPTED") overviewData.accepted += 1;
+        if (application.status === "NEW APPLICATION")
+          overviewData.unlabelled += 1;
+        overviewData.total += 1;
+      });
+      return {
+        applicationsData: res.data,
+        overviewData,
+      };
+    });
+
+  const { data, error } = useSWR("/api/admin/app", fetcher);
+  if (data && !error) console.log("data", data);
+
+  const [overviewData, setOverviewData] = useState(null);
+
+  useEffect(() => {
+    if (typeof data !== "undefined") {
+      setOverviewData(data.overviewData);
     }
-  );
+  }, [data]);
 
   if (!loading && session) {
     if (session.dbUser.role !== "ADMIN") {
@@ -30,24 +55,41 @@ export default function Index() {
   const [showDetailView, setShowDetailView] = useState(false);
   const [detailViewData, setDetailViewData] = useState(null);
 
-  let overviewData = {
-    unlabelled: 0,
-    rejected: 0,
-    accepted: 0,
-    total: 0,
-  };
-
   if (error) return <div>Error Loading Data</div>;
   if (!data) return <Loading />;
 
-  data.forEach((application) => {
-    if (application.status === "ACCEPTED") overviewData.accepted += 1;
-    if (application.status === "REJECTED") overviewData.rejected += 1;
-    if (application.status === "NEW APPLICATION") {
-      overviewData.unlabelled += 1;
+  const updateOverview = (type, isPreviouslyUnlabelled) => {
+    if (type === "accepted") {
+      if (isPreviouslyUnlabelled) {
+        setOverviewData({
+          ...overviewData,
+          unlabelled: overviewData.unlabelled - 1,
+          accepted: overviewData.accepted + 1,
+        });
+      } else {
+        setOverviewData({
+          ...overviewData,
+          rejected: overviewData.rejected - 1,
+          accepted: overviewData.accepted + 1,
+        });
+      }
     }
-    overviewData.total += 1;
-  });
+    if (type === "rejected") {
+      if (isPreviouslyUnlabelled) {
+        setOverviewData({
+          ...overviewData,
+          unlabelled: overviewData.unlabelled - 1,
+          rejected: overviewData.rejected + 1,
+        });
+      } else {
+        setOverviewData({
+          ...overviewData,
+          rejected: overviewData.rejected + 1,
+          accepted: overviewData.accepted - 1,
+        });
+      }
+    }
+  };
 
   if (
     !loading &&
@@ -60,6 +102,7 @@ export default function Index() {
       <DetailedView
         data={detailViewData}
         setShowDetailView={setShowDetailView}
+        updateOverview={updateOverview}
       />
     );
   else {
@@ -72,9 +115,10 @@ export default function Index() {
           <Header />
           <Overview overviewData={overviewData} />
           <ApplicationsTable
-            data={data}
+            data={data.applicationsData}
             setDetailViewData={setDetailViewData}
             setShowDetailView={setShowDetailView}
+            updateOverview={updateOverview}
           />
         </main>
       </div>

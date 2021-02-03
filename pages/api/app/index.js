@@ -23,29 +23,27 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     await dbConnect();
 
-    // Check if user is new user
-    const session = await getSession({ req });
-    let isCorrectUser = await isAuthenticated(req, "NEW USER");
-    if (!isCorrectUser) {
-      return res.status(401);
-    }
+    // // Check if user is new user
+    // const session = await getSession({ req });
+    // let isCorrectUser = await isAuthenticated(req, "NEW USER");
+    // if (!isCorrectUser) {
+    //   return res.status(401);
+    // }
 
-    // Check if user has submitted an application
-    try {
-      let application = await Application.findOne({
-        email: session.user.email,
-        // TODO: add cohort
-      }).lean();
-      if (application !== null) {
-        return res.send("You have already submitted previously");
-      }
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("Error");
-      return;
-    }
-
-    console.log(req.body);
+    // // Check if user has submitted an application
+    // try {
+    //   let application = await Application.findOne({
+    //     email: session.user.email,
+    //     // TODO: add cohort
+    //   }).lean();
+    //   if (application !== null) {
+    //     return res.send("You have already submitted previously");
+    //   }
+    // } catch (err) {
+    //   console.log(err);
+    //   res.status(400).send("Error");
+    //   return;
+    // }
 
     // Data validation
     let isDataValid = false;
@@ -59,8 +57,6 @@ export default async function handler(req, res) {
       console.log(errValidationResponse);
       return res.status(400).send(errValidationResponse);
     }
-
-    console.log(isDataValid);
 
     // Save into database
     if (isDataValid) {
@@ -80,16 +76,16 @@ export default async function handler(req, res) {
         return;
       }
 
-      try {
-        await User.findOneAndUpdate(
-          { _id: session.dbUser._id },
-          { role: "APPLICANT" }
-        );
-      } catch (err) {
-        console.log(err);
-        res.status(400).send("Error");
-        return;
-      }
+      // try {
+      //   await User.findOneAndUpdate(
+      //     { _id: session.dbUser._id },
+      //     { role: "APPLICANT" }
+      //   );
+      // } catch (err) {
+      //   console.log(err);
+      //   res.status(400).send("Error");
+      //   return;
+      // }
 
       res.send("Application is successful");
     }

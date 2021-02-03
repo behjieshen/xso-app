@@ -4,6 +4,7 @@ export default function ApplicationsTable({
   data,
   setDetailViewData,
   setShowDetailView,
+  updateOverview
 }) {
   return (
     <div className="block mt-8">
@@ -34,7 +35,8 @@ export default function ApplicationsTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
-            {data.map((application, index) => {
+            {console.log(data)}
+            {typeof data !== 'undefined' && data.map((application, index) => {
               return (
                 <ApplicationsTableRow
                   key={application._id}
@@ -42,6 +44,7 @@ export default function ApplicationsTable({
                   index={index}
                   setDetailViewData={setDetailViewData}
                   setShowDetailView={setShowDetailView}
+                  updateOverview={updateOverview}
                 />
               );
             })}

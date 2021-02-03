@@ -2,12 +2,11 @@ import { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { signOut } from "next-auth/client";
 import { useCurrentUser } from "../hooks/index";
-import { signOut } from "next-auth/client";
 
 export default function Sidebar({ image, name }) {
   const [settingVisible, setSettingVisible] = useState(false);
   const [sideNavVisible, setSideNavVisible] = useState(true);
-  const [{ mutate }] = useCurrentUser();
+  const [_, { mutate }] = useCurrentUser();
   const onSignout = () => {
     mutate(null, false);
     signOut({ callbackUrl: process.env.SIGN_OUT_URL });

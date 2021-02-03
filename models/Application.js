@@ -32,7 +32,11 @@ let applicationSchema = new Schema({
   image: String,
 });
 
-let validationSchema = yup.object().shape({
+export const Application =
+  mongoose.models["Application"] ||
+  mongoose.model("Application", applicationSchema, "applications");
+
+export const validationSchema = yup.object().shape({
   fullName: yup.string().required(),
   email: yup.string().email().required(),
   location: yup.string().required(),
@@ -54,10 +58,10 @@ let validationSchema = yup.object().shape({
       })
     )
     .required(),
-  linkedinURL: yup.string().required().url(),
+  linkedinURL: yup.string().url(),
   resumeURL: yup.string().required().url(),
   youtubeIntroductionURL: yup.string().required().url(),
-  otherComments: yup.string().required(),
+  otherComments: yup.string(),
   createdAt: yup.date().default(function () {
     return new Date();
   }),
@@ -69,9 +73,3 @@ let validationSchema = yup.object().shape({
     }),
   image: yup.string().required().url(),
 });
-
-export { validationSchema };
-
-export const Application =
-  mongoose.models["Application"] ||
-  mongoose.model("Application", applicationSchema, "applications");

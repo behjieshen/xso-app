@@ -6,6 +6,8 @@ import { uploadFile } from "../utils/firebase";
 import { applicationSchema } from "../models/validationSchema";
 import { getNestedValueInObject } from "../utils/getNestedValueInObject";
 import * as yup from "yup";
+import Input from "./form/Input";
+import isEmptyObject from "../utils/isEmptyObject";
 
 export default function XSOForm() {
   const [resumeData, setResumeData] = useState(null);
@@ -49,7 +51,6 @@ export default function XSOForm() {
       image: session.user.image,
     },
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
       const fileExtension = `.${resumeData.name.split(".")[1]}`;
       const fileName = values.fullName.replace(/\s/g, "_") + fileExtension;
       let fileLink;
@@ -95,88 +96,19 @@ export default function XSOForm() {
         onSubmit={formik.handleSubmit}
       >
         <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-          <h3 className="leading-6 font-medium text-xl text-gray-900">
-            Basic Info
-          </h3>
+          {/* Basic Info */}
+          <h3 className="leading-6 font-medium text-xl text-gray-900">Basic Info</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Full Name */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
-              <label
-                htmlFor="fullName"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                Full Name*
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  type="text"
-                  name="fullName"
-                  id="fullName"
-                  autoComplete="full-name"
-                  onChange={formik.handleChange}
-                  value={formik.values.fullName}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject("fullName", formik.errors)
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-md`}
-                />
-                {ErrorMessage("fullName")}
-              </div>
-            </div>
+            <Input formik={formik} displayName="Full Name" fieldName="fullName" required />
+
             {/* Location */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                Location*
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  id="location"
-                  name="location"
-                  type="text"
-                  autoComplete="location"
-                  onChange={formik.handleChange}
-                  value={formik.values.location}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject("location", formik.errors)
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-md`}
-                />
-                {ErrorMessage("location")}
-                {console.log(formik.errors)}
-              </div>
-            </div>
+            <Input formik={formik} displayName="Location" fieldName="location" required />
+
             {/* What is your LinkedIn? (if you have one) */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
-              <label
-                htmlFor="linkedinURL"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                LinkedIn URL
-                <p className="text-xxs font-base text-gray-400">
-                  (if you have one)
-                </p>
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  type="text"
-                  name="linkedinURL"
-                  id="linkedinURL"
-                  onChange={formik.handleChange}
-                  value={formik.values.linkedinURL}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject("linkedinURL", formik.errors)
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-md`}
-                />
-                {ErrorMessage("linkedinURL")}
-              </div>
-            </div>
+            <Input formik={formik} displayName="Linkedin URL" fieldName="linkedinURL">
+              <p className="text-xxs font-base text-gray-400">(if you have one)</p>
+            </Input>
 
             {/* Resume */}
             <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
@@ -194,14 +126,14 @@ export default function XSOForm() {
                 >
                   <div
                     className={`max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-dashed ${
-                      getNestedValueInObject("resumeFile", formik.errors)
+                      getNestedValueInObject("resumeFile", formik.errors) &&
+                      getNestedValueInObject("resumeFile", formik.touched)
                         ? "border-red-500"
                         : "border-gray-300"
                     } rounded-md`}
                   >
                     <div className="space-y-1 text-center">
-                      {resumeData !== null &&
-                      typeof resumeData !== "undefined" ? (
+                      {resumeData !== null && typeof resumeData !== "undefined" ? (
                         <svg
                           className="mx-auto h-8 w-8 text-green-300"
                           xmlns="http://www.w3.org/2000/svg"
@@ -235,8 +167,7 @@ export default function XSOForm() {
 
                       <div className="flex text-sm text-gray-600 flex-col flex items-center">
                         <span>
-                          {resumeData !== null &&
-                          typeof resumeData !== "undefined"
+                          {resumeData !== null && typeof resumeData !== "undefined"
                             ? resumeData.name
                             : "Upload a file"}
                         </span>
@@ -246,20 +177,14 @@ export default function XSOForm() {
                           type="file"
                           onChange={(e) => {
                             setResumeData(e.target.files[0]);
-                            formik.setFieldValue(
-                              "resumeFile",
-                              e.target.files[0].name
-                            );
+                            formik.setFieldValue("resumeFile", e.target.files[0].name);
                           }}
                           className="sr-only"
                           accept=".doc, .docx, .pdf"
                         />
                       </div>
-                      {resumeData !== null &&
-                      typeof resumeData !== "undefined" ? null : (
-                        <p className="text-xs text-gray-500">
-                          .pdf or .docx only
-                        </p>
+                      {resumeData !== null && typeof resumeData !== "undefined" ? null : (
+                        <p className="text-xs text-gray-500">.pdf or .docx only</p>
                       )}
                     </div>
                   </div>
@@ -268,63 +193,21 @@ export default function XSOForm() {
               </div>
             </div>
           </div>
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">
-            Education
-          </h3>
+
+          {/* Education */}
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Education</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Where do you currently (or did you) go to school? */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-              <label
-                htmlFor="school"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                School*
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  type="text"
-                  name="education.school"
-                  id="school"
-                  autoComplete="school"
-                  onChange={formik.handleChange}
-                  value={formik.values.education.school}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject("education.school", formik.errors)
-                      ? "border-red-500"
-                      : "border-gray-200"
-                  } rounded-md`}
-                />
-                {ErrorMessage("education.school")}
-              </div>
-            </div>
+            <Input formik={formik} displayName="School" fieldName="education.school" required />
+
             {/* Major */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-              <label
-                htmlFor="major"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                Major*
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  type="text"
-                  name="education.universityMajor"
-                  id="universityMajor"
-                  autoComplete="major"
-                  onChange={formik.handleChange}
-                  value={formik.values.education.universityMajor}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject(
-                      "education.universityMajor",
-                      formik.errors
-                    )
-                      ? "border-red-500"
-                      : "border-gray-200"
-                  } rounded-md`}
-                />
-                {ErrorMessage("education.universityMajor")}
-              </div>
-            </div>
+            <Input
+              formik={formik}
+              displayName="Major"
+              fieldName="education.universityMajor"
+              required
+            />
+
             {/* Student Status */}
             <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
               <label
@@ -351,10 +234,8 @@ export default function XSOForm() {
                           value={status}
                           type="radio"
                           className={`focus-within:outline-none h-4 w-4 text-indigo-600 ${
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.errors
-                            )
+                            getNestedValueInObject("education.studentStatus", formik.errors) &&
+                            getNestedValueInObject("education.studentStatus", formik.touched)
                               ? "border-red-500"
                               : "border-gray-300"
                           }`}
@@ -362,10 +243,8 @@ export default function XSOForm() {
                         <label
                           htmlFor="studentStatus"
                           className={`ml-3 block text-sm ${
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.errors
-                            )
+                            getNestedValueInObject("education.studentStatus", formik.errors) &&
+                            getNestedValueInObject("education.studentStatus", formik.touched)
                               ? "text-red-500"
                               : "text-gray-700"
                           }`}
@@ -380,114 +259,64 @@ export default function XSOForm() {
               </div>
             </div>
           </div>
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">
-            Get To Know You!
-          </h3>
+
+          {/* Get To Know You! */}
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Get To Know You!</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Youtube Introduction Video */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
-              <label
-                htmlFor="youtubeIntroductionURL"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                Youtube Introduction Link*
-                <p className="text-xxs font-base text-gray-400">
-                  Record a 1 minute video to introduce yourself!
-                  <br />
-                  <br />
-                  In the video, be sure to include:
-                  <br />
-                  1. Share your name
-                  <br />
-                  2. Where you are from
-                  <br />
-                  3. Share one fun fact about yourself
-                  <br />
-                  4. What do you want to get out of the program
-                  <br />
-                  5. Where do you want to be in 5-10 years time
-                  <br />
-                  <br />
-                  You are allowed to make the video private, but please ensure
-                  the link is working.
-                </p>
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <input
-                  type="text"
-                  name="youtubeIntroductionURL"
-                  id="youtubeIntroductionURL"
-                  onChange={formik.handleChange}
-                  value={formik.values.youtubeIntroductionURL}
-                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                    getNestedValueInObject(
-                      "youtubeIntroductionURL",
-                      formik.errors
-                    )
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-md`}
-                />
-                {ErrorMessage("youtubeIntroductionURL")}
-              </div>
-            </div>
+            <Input
+              formik={formik}
+              displayName="Youtube Introduction URL"
+              fieldName="youtubeIntroductionURL"
+            >
+              <p className="text-xxs font-base text-gray-400">
+                Record a 1 minute video to introduce yourself!
+                <br />
+                <br />
+                In the video, be sure to include:
+                <br />
+                1. Share your name
+                <br />
+                2. Where you are from
+                <br />
+                3. Share one fun fact about yourself
+                <br />
+                4. What do you want to get out of the program
+                <br />
+                5. Where do you want to be in 5-10 years time
+                <br />
+                <br />
+                You are allowed to make the video private, but please ensure the link is working.
+              </p>
+            </Input>
+            {/* Open Questions */}
             {formik.values.openQuestions.map((response, index) => (
-              <div
+              <Input
                 key={index}
-                className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5"
-              >
-                <label
-                  htmlFor={`openQuestions.${index}.question`}
-                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                >
-                  {response.question}
-                </label>
-                <div className="mt-1 sm:mt-0 sm:col-span-2">
-                  <textarea
-                    id={`openQuestions.${index}.answer`}
-                    name={`openQuestions.${index}.answer`}
-                    rows="4"
-                    onChange={formik.handleChange}
-                    value={formik.values.openQuestions[index].answer}
-                    className={`max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                      getNestedValueInObject(
-                        `openQuestions.${index}.answer`,
-                        formik.errors
-                      )
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } rounded-md`}
-                  ></textarea>
-                  {ErrorMessage(`openQuestions.${index}.answer`)}
-                </div>
-              </div>
+                formik={formik}
+                displayName={response.question}
+                fieldName={`openQuestions.${index}.answer`}
+                type="textarea"
+              />
             ))}
 
             {/* Other Comments */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-              <label
-                htmlFor="about"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                Do you have any comments?
-              </label>
-              <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <textarea
-                  id="otherComments"
-                  name="otherComments"
-                  rows="4"
-                  onChange={formik.handleChange}
-                  value={formik.values.otherComments}
-                  className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
-                ></textarea>
-                {ErrorMessage("otherComments")}
-              </div>
-            </div>
+            <Input
+              formik={formik}
+              displayName="Do you have any comments?"
+              fieldName="otherComments"
+              type="textarea"
+            />
           </div>
         </div>
 
         <div className="pt-5">
-          <div className="flex justify-end">
+          <div className="flex justify-end items-center">
+            {console.log("Formik Error", formik.errors, isEmptyObject(formik.errors))}
+            {console.log("Formik Touched", formik.touched, isEmptyObject(formik.touched))}
+            {!isEmptyObject(formik.errors) && !isEmptyObject(formik.touched) ? (
+              <p className="text-red-500 mr-5">* Please fill up all required elements</p>
+            ) : null}
             <button
               type="button"
               className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus-within:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

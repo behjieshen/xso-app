@@ -14,6 +14,8 @@ export default function DetailedView({
   data,
   setShowDetailView,
   updateOverview,
+  updateData,
+  index
 }) {
   const [session, loading] = useSession();
 
@@ -26,7 +28,7 @@ export default function DetailedView({
     data.status === "REJECTED"
   );
 
-  const { id } = data._id;
+  const { _id: id, status } = data;
 
   // Scroll to top at table view
   // useEffect(() => {
@@ -73,13 +75,17 @@ export default function DetailedView({
                 // Update overviewData state
                 updateOverview("accepted", status === "NEW APPLICATION");
 
+                // Update application state
+                let newApplicationData = { ...data, status: "ACCEPTED" };
+                updateData(newApplicationData, index);
+
                 // Adjust state for accept/reject buttons
-                setActiveAcceptButton(false);
-                setActiveRejectButton(true);
+                setActiveAcceptButton(true);
+                setActiveRejectButton(false);
 
                 // Update database in the background after UI changes are made
                 try {
-                  await axios.put(`/api/admin/app/${id}/accepted`);
+                  await axios.put(`/api/admin/app/${id}/accept`);
                 } catch (err) {
                   console.log(err);
                 }
@@ -97,6 +103,10 @@ export default function DetailedView({
               onClick={async () => {
                 // Update overviewData state
                 updateOverview("rejected", status === "NEW APPLICATION");
+
+                // Update application state
+                let newApplicationData = { ...data, status: "REJECTED" };
+                updateData(newApplicationData, index);
 
                 // Adjust state for accept/reject buttons
                 setActiveAcceptButton(false);

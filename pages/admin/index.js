@@ -15,7 +15,10 @@ export default function Index() {
   const [overviewData, setOverviewData] = useState(null);
   const [applicationsData, setApplicationsData] = useState([]);
   const [showDetailView, setShowDetailView] = useState(false);
-  const [detailViewData, setDetailViewData] = useState(null);
+  const [detailViewData, setDetailViewData] = useState({
+    data: {},
+    index: null,
+  });
 
   // Redirect user to home page for non-admins
   if (!loading && session) {
@@ -118,9 +121,13 @@ export default function Index() {
   } else if (showDetailView)
     return (
       <DetailedView
-        data={detailViewData}
+        data={detailViewData.data}
+        index={detailViewData.index}
         setShowDetailView={setShowDetailView}
         updateOverview={updateOverview}
+        updateData={(updatedApplication, index) =>
+          updateData(applicationsData, updatedApplication, index)
+        }
       />
     );
   else {

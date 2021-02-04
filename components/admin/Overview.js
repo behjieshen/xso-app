@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import BasicStats from "./BasicStats";
 
 export default function Overview({ overviewData }) {
-  console.log(overviewData);
   if (overviewData !== null && typeof overviewData !== 'undefined')
     return (
       <div className="px-4 mt-6 sm:px-6 lg:px-8">

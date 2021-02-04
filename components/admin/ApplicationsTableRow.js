@@ -29,7 +29,7 @@ export default function ApplicationsTableRow({
       className="px-6 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
       onClick={() => {
         // Show detail view once user click on row
-        setDetailViewData(application);
+        setDetailViewData({ data: application, index });
         setShowDetailView(true);
       }}
     >

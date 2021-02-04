@@ -1,7 +1,6 @@
 import moment from "moment";
 import { useSession } from "next-auth/client";
-import { useState, useEffect } from "react";
-import useSWR, { mutate } from "swr";
+import { useState } from "react";
 import {
   IoLogoLinkedin,
   IoLogoYoutube,
@@ -11,7 +10,11 @@ import {
 } from "react-icons/io5";
 import axios from "axios";
 
-export default function DetailedView({ data, setShowDetailView, updateOverview }) {
+export default function DetailedView({
+  data,
+  setShowDetailView,
+  updateOverview,
+}) {
   const [session, loading] = useSession();
 
   if (!loading && !session) return <div>Error</div>;
@@ -23,11 +26,12 @@ export default function DetailedView({ data, setShowDetailView, updateOverview }
     data.status === "REJECTED"
   );
 
-  const [hasUsedCTA, setHasUsedCTA] = useState(false);
+  const { id } = data._id;
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  // Scroll to top at table view
+  // useEffect(() => {
+  //   window.scrollTo(0, 0)
+  // }, [])
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-auto w-full">
@@ -65,11 +69,15 @@ export default function DetailedView({ data, setShowDetailView, updateOverview }
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
             <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                updateOverview('accepted', status === 'NEW APPLICATION');
+              onClick={async () => {
+                // Update overviewData state
+                updateOverview("accepted", status === "NEW APPLICATION");
+
+                // Adjust state for accept/reject buttons
                 setActiveAcceptButton(false);
                 setActiveRejectButton(true);
+
+                // Update database in the background after UI changes are made
                 try {
                   await axios.put(`/api/admin/app/${id}/accepted`);
                 } catch (err) {
@@ -86,11 +94,15 @@ export default function DetailedView({ data, setShowDetailView, updateOverview }
               Accept
             </button>
             <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                updateOverview('rejected', status === 'NEW APPLICATION');
+              onClick={async () => {
+                // Update overviewData state
+                updateOverview("rejected", status === "NEW APPLICATION");
+
+                // Adjust state for accept/reject buttons
                 setActiveAcceptButton(false);
                 setActiveRejectButton(true);
+
+                // Update database in the background after UI changes are made
                 try {
                   await axios.put(`/api/admin/app/${id}/reject`);
                 } catch (err) {

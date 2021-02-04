@@ -26,7 +26,7 @@ export default function ApplicationsTableRow({
 
   return (
     <tr
-      className="px-6 cursor-pointer hover:bg-gray-100"
+      className="px-6 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
       onClick={() => {
         // Show detail view once user click on row
         setDetailViewData(application);
@@ -61,7 +61,7 @@ export default function ApplicationsTableRow({
             let newApplicationData = { ...application, status: "ACCEPTED" };
             updateData(newApplicationData, index);
 
-            // Adjust state for detailed view buttons
+            // Adjust state for accept/reject buttons
             setActiveAcceptButton(true);
             setActiveRejectButton(false);
 
@@ -93,7 +93,7 @@ export default function ApplicationsTableRow({
             let newApplicationData = { ...application, status: "REJECTED" };
             updateData(newApplicationData, index);
 
-            // Adjust state for detailed view buttons
+            // Adjust state for accept/reject buttons
             setActiveAcceptButton(false);
             setActiveRejectButton(true);
 

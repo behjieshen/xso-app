@@ -4,11 +4,12 @@ export default function ApplicationsTable({
   data,
   setDetailViewData,
   setShowDetailView,
+  updateOverview,
+  updateData
 }) {
   return (
     <div className="block mt-8">
       <div className="align-middle inline-block sm:min-w-full border-b border-gray-200 max-w-full overflow-x-auto">
-        {/* <ApplicationsTable data={data} /> */}
         <table className="min-w-full">
           <thead>
             <tr className="border-t border-gray-200">
@@ -34,7 +35,7 @@ export default function ApplicationsTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
-            {data.map((application, index) => {
+            {typeof data !== 'undefined' && data.map((application, index) => {
               return (
                 <ApplicationsTableRow
                   key={application._id}
@@ -42,6 +43,8 @@ export default function ApplicationsTable({
                   index={index}
                   setDetailViewData={setDetailViewData}
                   setShowDetailView={setShowDetailView}
+                  updateOverview={updateOverview}
+                  updateData={(updatedApplication, index) => updateData(data, updatedApplication, index)}
                 />
               );
             })}

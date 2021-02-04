@@ -1,14 +1,22 @@
 import axios from "axios";
-import { useFormik } from "formik";
+import { ErrorMessage, getIn, useFormik } from "formik";
 import { useSession } from "next-auth/client";
 import { useState } from "react";
 import { uploadFile } from "../utils/firebase";
+import { applicationSchema } from "../models/validationSchema";
+import { getNestedValueInObject } from "../utils/getNestedValueInObject";
+import * as yup from "yup";
 
 export default function XSOForm() {
   const [resumeData, setResumeData] = useState(null);
   const [session] = useSession();
 
   const formik = useFormik({
+    validationSchema: applicationSchema.concat(
+      yup.object({
+        resumeFile: yup.mixed().required("This field is required"),
+      })
+    ),
     initialValues: {
       fullName: "",
       email: session.user.email,
@@ -35,6 +43,7 @@ export default function XSOForm() {
       ],
       linkedinURL: "",
       resumeURL: "",
+      resumeFile: "",
       youtubeIntroductionURL: "",
       otherComments: "",
       image: session.user.image,
@@ -60,9 +69,23 @@ export default function XSOForm() {
         }
       }
 
-      await resetForm();
+      // await resetForm();
     },
   });
+
+  const ErrorMessage = (field) => {
+    let error = getNestedValueInObject(field, formik.errors);
+    let touched = getNestedValueInObject(field, formik.touched);
+    if (touched && error) {
+      return (
+        <p className="mt-2 text-sm text-red-500">
+          {/* {capitalizeFirstLetter(error.replace(`${field} `, ""))} */}
+          {error}
+        </p>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="px-20 py-16">
@@ -92,8 +115,13 @@ export default function XSOForm() {
                   autoComplete="full-name"
                   onChange={formik.handleChange}
                   value={formik.values.fullName}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject("fullName", formik.errors)
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md`}
                 />
+                {ErrorMessage("fullName")}
               </div>
             </div>
             {/* Location */}
@@ -112,8 +140,14 @@ export default function XSOForm() {
                   autoComplete="location"
                   onChange={formik.handleChange}
                   value={formik.values.location}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject("location", formik.errors)
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md`}
                 />
+                {ErrorMessage("location")}
+                {console.log(formik.errors)}
               </div>
             </div>
             {/* What is your LinkedIn? (if you have one) */}
@@ -134,8 +168,13 @@ export default function XSOForm() {
                   id="linkedinURL"
                   onChange={formik.handleChange}
                   value={formik.values.linkedinURL}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject("linkedinURL", formik.errors)
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md`}
                 />
+                {ErrorMessage("linkedinURL")}
               </div>
             </div>
 
@@ -153,7 +192,13 @@ export default function XSOForm() {
                   htmlFor="file-upload"
                   className="relative w-full cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
                 >
-                  <div className="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                  <div
+                    className={`max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-dashed ${
+                      getNestedValueInObject("resumeFile", formik.errors)
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } rounded-md`}
+                  >
                     <div className="space-y-1 text-center">
                       {resumeData !== null &&
                       typeof resumeData !== "undefined" ? (
@@ -201,6 +246,10 @@ export default function XSOForm() {
                           type="file"
                           onChange={(e) => {
                             setResumeData(e.target.files[0]);
+                            formik.setFieldValue(
+                              "resumeFile",
+                              e.target.files[0].name
+                            );
                           }}
                           className="sr-only"
                           accept=".doc, .docx, .pdf"
@@ -215,6 +264,7 @@ export default function XSOForm() {
                     </div>
                   </div>
                 </label>
+                {ErrorMessage("resumeFile")}
               </div>
             </div>
           </div>
@@ -238,8 +288,13 @@ export default function XSOForm() {
                   autoComplete="school"
                   onChange={formik.handleChange}
                   value={formik.values.education.school}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject("education.school", formik.errors)
+                      ? "border-red-500"
+                      : "border-gray-200"
+                  } rounded-md`}
                 />
+                {ErrorMessage("education.school")}
               </div>
             </div>
             {/* Major */}
@@ -258,8 +313,16 @@ export default function XSOForm() {
                   autoComplete="major"
                   onChange={formik.handleChange}
                   value={formik.values.education.universityMajor}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject(
+                      "education.universityMajor",
+                      formik.errors
+                    )
+                      ? "border-red-500"
+                      : "border-gray-200"
+                  } rounded-md`}
                 />
+                {ErrorMessage("education.universityMajor")}
               </div>
             </div>
             {/* Student Status */}
@@ -273,104 +336,48 @@ export default function XSOForm() {
               <div className="sm:col-span-2">
                 <div className="max-w-lg">
                   <div className="mt-4">
-                    <div className="flex items-center py-2">
-                      <input
-                        id="studentStatus"
-                        name="education.studentStatus"
-                        onChange={formik.handleChange}
-                        value="High School Graduate"
-                        type="radio"
-                        className="focus-within:outline-none h-4 w-4 text-indigo-600 border-gray-300"
-                      />
-                      <label
-                        htmlFor="studentStatus"
-                        className="ml-3 block text-sm font-medium text-gray-700"
-                      >
-                        High School Graduate
-                      </label>
-                    </div>
-                    <div className="flex items-center py-2">
-                      <input
-                        id="studentStatus"
-                        name="education.studentStatus"
-                        onChange={formik.handleChange}
-                        value="College Freshman"
-                        type="radio"
-                        className="focus-within:outline-none h-4 w-4 text-indigo-600 border-gray-300"
-                      />
-                      <label
-                        htmlFor="push_email"
-                        className="ml-3 block text-sm font-medium text-gray-700"
-                      >
-                        College Freshman
-                      </label>
-                    </div>
-                    <div className="flex items-center py-2">
-                      <input
-                        id="studentStatus"
-                        name="education.studentStatus"
-                        onChange={formik.handleChange}
-                        value="College Sophomore"
-                        type="radio"
-                        className="focus-within:outline-none h-4 w-4 text-indigo-600 border-gray-300"
-                      />
-                      <label
-                        htmlFor="push_nothing"
-                        className="ml-3 block text-sm font-medium text-gray-700"
-                      >
-                        College Sophomore
-                      </label>
-                    </div>
-                    <div className="flex items-center py-2">
-                      <input
-                        id="studentStatus"
-                        name="education.studentStatus"
-                        onChange={formik.handleChange}
-                        value="College Junior"
-                        type="radio"
-                        className="focus-within:outline-none h-4 w-4 text-indigo-600 border-gray-300"
-                      />
-                      <label
-                        htmlFor="push_nothing"
-                        className="ml-3 block text-sm font-medium text-gray-700"
-                      >
-                        College Junior
-                      </label>
-                    </div>
-                    <div className="flex items-center py-2">
-                      <input
-                        id="studentStatus"
-                        name="education.studentStatus"
-                        onChange={formik.handleChange}
-                        value="College Senior"
-                        type="radio"
-                        className="focus-within:outline-none h-4 w-4 text-indigo-600 border-gray-300"
-                      />
-                      <label
-                        htmlFor="push_nothing"
-                        className="ml-3 block text-sm font-medium text-gray-700"
-                      >
-                        College Senior
-                      </label>
-                    </div>
+                    {[
+                      "High School Graduate",
+                      "College Freshman",
+                      "College Sophomore",
+                      "College Junior",
+                      "College Senior",
+                    ].map((status, index) => (
+                      <div className="flex items-center py-2" key={index}>
+                        <input
+                          id="studentStatus"
+                          name="education.studentStatus"
+                          onChange={formik.handleChange}
+                          value={status}
+                          type="radio"
+                          className={`focus-within:outline-none h-4 w-4 text-indigo-600 ${
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.errors
+                            )
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
+                        />
+                        <label
+                          htmlFor="studentStatus"
+                          className={`ml-3 block text-sm ${
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.errors
+                            )
+                              ? "text-red-500"
+                              : "text-gray-700"
+                          }`}
+                        >
+                          {status}
+                        </label>
+                      </div>
+                    ))}
                   </div>
+                  {ErrorMessage("education.studentStatus")}
                 </div>
               </div>
-
-              {/* <div className="mt-1 sm:mt-0 sm:col-span-2">
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country"
-                  className="max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                >
-                  <option>High School Graduate</option>
-                  <option>College Freshman</option>
-                  <option>College Sophomore</option>
-                  <option>College Junior</option>
-                  <option>College Senior</option>
-                </select>
-              </div> */}
             </div>
           </div>
           <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">
@@ -412,8 +419,16 @@ export default function XSOForm() {
                   id="youtubeIntroductionURL"
                   onChange={formik.handleChange}
                   value={formik.values.youtubeIntroductionURL}
-                  className="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                  className={`block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    getNestedValueInObject(
+                      "youtubeIntroductionURL",
+                      formik.errors
+                    )
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md`}
                 />
+                {ErrorMessage("youtubeIntroductionURL")}
               </div>
             </div>
             {formik.values.openQuestions.map((response, index) => (
@@ -434,11 +449,16 @@ export default function XSOForm() {
                     rows="4"
                     onChange={formik.handleChange}
                     value={formik.values.openQuestions[index].answer}
-                    className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+                    className={`max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                      getNestedValueInObject(
+                        `openQuestions.${index}.answer`,
+                        formik.errors
+                      )
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } rounded-md`}
                   ></textarea>
-                  <p className="mt-2 text-sm text-gray-500">
-                    Write a few sentences about yourself.
-                  </p>
+                  {ErrorMessage(`openQuestions.${index}.answer`)}
                 </div>
               </div>
             ))}
@@ -457,12 +477,10 @@ export default function XSOForm() {
                   name="otherComments"
                   rows="4"
                   onChange={formik.handleChange}
-                  value={formik.otherComments}
+                  value={formik.values.otherComments}
                   className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
                 ></textarea>
-                <p className="mt-2 text-sm text-gray-500">
-                  Write a few sentences about yourself.
-                </p>
+                {ErrorMessage("otherComments")}
               </div>
             </div>
           </div>

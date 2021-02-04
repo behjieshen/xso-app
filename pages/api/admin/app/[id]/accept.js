@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     // Check if user is admin
     let isCorrectUser = await isAuthenticated(req, "ADMIN");
     if (!isCorrectUser) {
-      return res.status(401).send('not authenticated');
+      return res.status(401).send("not authenticated");
     }
 
     await dbConnect();

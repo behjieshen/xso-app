@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import ApplicationsTable from "../../components/admin/ApplicationsTable";
-
 import Header from "../../components/admin/Header";
 import MainLayout from "../../layout/MainLayout";
 import axios from "axios";
@@ -13,9 +12,22 @@ import Overview from "../../components/admin/Overview";
 
 export default function Index() {
   const [session, loading] = useSession();
+  const [overviewData, setOverviewData] = useState(null);
+  const [applicationsData, setApplicationsData] = useState([]);
+  const [showDetailView, setShowDetailView] = useState(false);
+  const [detailViewData, setDetailViewData] = useState(null);
 
+  // Redirect user to home page for non-admins
+  if (!loading && session) {
+    if (session.dbUser.role !== "ADMIN") {
+      Router.push(process.env.NEXTAUTH_URL + "/");
+    }
+  }
+
+  // Use Axios to fetch data
   const fetcher = (url) =>
     axios.get(url).then((res) => {
+      // Compute overview
       let overviewData = {
         accepted: 0,
         rejected: 0,
@@ -29,35 +41,36 @@ export default function Index() {
           overviewData.unlabelled += 1;
         overviewData.total += 1;
       });
+      // return as { data } in useSWR
       return {
         applicationsData: res.data,
         overviewData,
       };
     });
 
+  // Retrieve applications data from API
   const { data, error } = useSWR("/api/admin/app", fetcher);
-  if (data && !error) console.log("data", data);
 
-  const [overviewData, setOverviewData] = useState(null);
-
+  // Set state once API call returns data
   useEffect(() => {
     if (typeof data !== "undefined") {
       setOverviewData(data.overviewData);
+      setApplicationsData(data.applicationsData);
     }
   }, [data]);
 
-  if (!loading && session) {
-    if (session.dbUser.role !== "ADMIN") {
-      Router.push(process.env.NEXTAUTH_URL + "/");
-    }
-  }
-
-  const [showDetailView, setShowDetailView] = useState(false);
-  const [detailViewData, setDetailViewData] = useState(null);
-
+  // Handle loading and error in API call
   if (error) return <div>Error Loading Data</div>;
   if (!data) return <Loading />;
 
+  // Update applicationsData state (to be passed as props)
+  const updateData = (originalData, updatedApplication, index) => {
+    let updatedData = originalData;
+    updatedData[index] = updatedApplication;
+    setApplicationsData(updatedData);
+  };
+
+  // Update overviewData state (to be passed as props)
   const updateOverview = (type, isPreviouslyUnlabelled) => {
     if (type === "accepted") {
       if (isPreviouslyUnlabelled) {
@@ -91,6 +104,11 @@ export default function Index() {
     }
   };
 
+  // 3 scenarios of render
+  // 1. If they are non-admins, display nothing
+  // 2. If request for detail view, show detailed application view
+  // 3. Else display default admin overview and table page
+
   if (
     !loading &&
     session !== typeof "undefined" &&
@@ -115,10 +133,11 @@ export default function Index() {
           <Header />
           <Overview overviewData={overviewData} />
           <ApplicationsTable
-            data={data.applicationsData}
+            data={applicationsData}
             setDetailViewData={setDetailViewData}
             setShowDetailView={setShowDetailView}
             updateOverview={updateOverview}
+            updateData={updateData}
           />
         </main>
       </div>

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Transition } from "@headlessui/react";
 import axios from "axios";
-import useSWR, { mutate } from "swr";
 
 export default function ApplicationsTableRow({
   data: application,
@@ -9,7 +7,9 @@ export default function ApplicationsTableRow({
   setDetailViewData,
   setShowDetailView,
   updateOverview,
+  updateData,
 }) {
+  // Destructure data to be displayed in table
   const {
     fullName,
     education: { school, studentStatus, universityMajor },
@@ -28,6 +28,7 @@ export default function ApplicationsTableRow({
     <tr
       className="px-6 cursor-pointer hover:bg-gray-100"
       onClick={() => {
+        // Show detail view once user click on row
         setDetailViewData(application);
         setShowDetailView(true);
       }}
@@ -38,7 +39,6 @@ export default function ApplicationsTableRow({
       <td className="py-3 px-2 text-sm text-gray-500 font-medium">
         {fullName}
       </td>
-      {/* <td className="py-3 px-2 text-sm text-gray-500 font-medium">{location}</td> */}
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">
         {school}
       </td>
@@ -51,10 +51,21 @@ export default function ApplicationsTableRow({
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left flex">
         <button
           onClick={async (e) => {
+            // Prevent propagating click event to parent elements that will trigger detailed view
             e.stopPropagation();
-            updateOverview('accepted', status === 'NEW APPLICATION');
+
+            // Update overviewData state
+            updateOverview("accepted", status === "NEW APPLICATION");
+
+            // Update application state
+            let newApplicationData = { ...application, status: "ACCEPTED" };
+            updateData(newApplicationData, index);
+
+            // Adjust state for detailed view buttons
             setActiveAcceptButton(true);
             setActiveRejectButton(false);
+
+            // Update database in the background after UI changes are made
             try {
               await axios.put(`/api/admin/app/${id}/accept`);
             } catch (err) {
@@ -72,10 +83,21 @@ export default function ApplicationsTableRow({
         </button>
         <button
           onClick={async (e) => {
+            // Prevent propagating click event to parent elements that will trigger detailed view
             e.stopPropagation();
-            updateOverview('rejected', status === 'NEW APPLICATION');
+
+            // Update overviewData state
+            updateOverview("rejected", status === "NEW APPLICATION");
+
+            // Update application state
+            let newApplicationData = { ...application, status: "REJECTED" };
+            updateData(newApplicationData, index);
+
+            // Adjust state for detailed view buttons
             setActiveAcceptButton(false);
             setActiveRejectButton(true);
+
+            // Update database in the background after UI changes are made
             try {
               await axios.put(`/api/admin/app/${id}/reject`);
             } catch (err) {

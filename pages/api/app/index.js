@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     const session = await getSession({ req });
     let isCorrectUser = await isAuthenticated(req, "NEW USER");
     if (!isCorrectUser) {
-      return res.status(401);
+      return res.status(401).send("Error");
     }
 
     // Check if user has submitted an application

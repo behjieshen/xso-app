@@ -312,8 +312,6 @@ export default function XSOForm() {
 
         <div className="pt-5">
           <div className="flex justify-end items-center">
-            {console.log("Formik Error", formik.errors, isEmptyObject(formik.errors))}
-            {console.log("Formik Touched", formik.touched, isEmptyObject(formik.touched))}
             {!isEmptyObject(formik.errors) && !isEmptyObject(formik.touched) ? (
               <p className="text-red-500 mr-5">* Please fill up all required elements</p>
             ) : null}

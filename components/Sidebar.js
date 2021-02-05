@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { signOut } from "next-auth/client";
 import { useCurrentUser } from "../hooks/index";
-
+import Link from "next/link";
 export default function Sidebar({ image, name }) {
   const [settingVisible, setSettingVisible] = useState(false);
   const [sideNavVisible, setSideNavVisible] = useState(true);
@@ -29,35 +29,38 @@ export default function Sidebar({ image, name }) {
           sideNavVisible ? null : "items-center"
         } flex flex-col border-r border-gray-200 pt-5 pb-4 bg-gray-100`}
       >
-        <div className="flex items-center flex-shrink-0 px-4">
-          <img
-            className="h-10 w-auto"
-            src="/images/xoogler-logo.png"
-            alt="Workflow"
-          />
-          <span
-            className={`${sideNavVisible ? null : "hidden"} ml-3 font-bold`}
-          >
-            Xoogler School
-          </span>
-          <svg
-            className={`${
-              sideNavVisible ? null : "hidden"
-            } flex-shrink-0 h-5 w-5 text-gray-400 hover:text-gray-500 ml-5 cursor-pointer`}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            onClick={() => setSideNavVisible(!sideNavVisible)}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
+        <Link href="/">
+          <a className="flex items-center flex-shrink-0 px-4">
+            <img
+              className="h-10 w-auto"
+              src="/images/xoogler-logo.png"
+              alt="Workflow"
             />
-          </svg>
-        </div>
+            <span
+              className={`${sideNavVisible ? null : "hidden"} ml-3 font-bold`}
+            >
+              Xoogler School
+            </span>
+            <svg
+              className={`${
+                sideNavVisible ? null : "hidden"
+              } flex-shrink-0 h-5 w-5 text-gray-400 hover:text-gray-500 ml-5 cursor-pointer`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              onClick={() => setSideNavVisible(!sideNavVisible)}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </a>
+        </Link>
+
         <svg
           className={`${
             !sideNavVisible ? null : "hidden"

@@ -7,7 +7,7 @@
  */
 
 import { getSession } from "next-auth/client";
-import { Application } from "../../../models/Application";
+import Application from "../../../models/Application";
 import { applicationSchema } from "../../../models/validationSchema";
 import dbConnect from "../../../utils/mongodb";
 import User from "../../../models/User";
@@ -62,8 +62,11 @@ export default async function handler(req, res) {
     // Save into database
     if (isDataValid) {
       try {
-        const newApplication = new Application(req.body);
-        console.log(req.body);
+        const newApplication = new Application({
+          ...req.body,
+          user: session.dbUser._id,
+        });
+
         await newApplication.save((err, application) => {
           if (err) {
             console.log(err);

@@ -1,6 +1,16 @@
 import MainLayout from "../layout/MainLayout";
 import XSOForm from "../components/XSOForm";
+import { useRouter } from "next/router";
+import { useCurrentUser } from "../hooks/index";
+import { useEffect } from "react";
+
 export default function Form() {
+  const router = useRouter();
+  const [user] = useCurrentUser();
+  if (user && user.role != "NEW USER") {
+    router.push("/");
+  }
+
   return (
     <div className="flex flex-col w-0 flex-1 overflow-hidden">
       {/* <!-- Search header --> */}

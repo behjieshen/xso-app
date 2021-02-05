@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
-const { Schema } = mongoose;
 
 // ref link: https://forms.gle/yUjCGbLZwKrKdj698
-let applicationSchema = new Schema({
+let applicationSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   fullName: String,
   email: String,
   location: String,
@@ -31,6 +34,5 @@ let applicationSchema = new Schema({
   image: String,
 });
 
-export const Application =
-  mongoose.models["Application"] ||
-  mongoose.model("Application", applicationSchema, "applications");
+export default mongoose.models.Application ||
+  mongoose.model("Application", applicationSchema);

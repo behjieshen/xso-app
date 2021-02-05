@@ -8,11 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "@headlessui/react": "^0.2.0",
     "@tailwindcss/forms": "^0.2.1",
     "autoprefixer": "^10.0.4",
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "firebase": "^8.2.4",
+    "formik": "^2.2.6",
     "json2csv": "^5.0.5",
     "moment": "^2.29.1",
     "mongodb": "^3.6.3",
@@ -23,6 +25,7 @@
     "postcss": "^8.1.10",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-icons": "^4.1.0",
     "swr": "^0.4.0",
     "tailwindcss": "^2.0.2",
     "yup": "^0.32.8"

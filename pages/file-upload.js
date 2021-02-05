@@ -15,6 +15,8 @@ export default function Test() {
         // Get file link
         let fileLink = await uploadFile(resumeData);
 
+        console.log(fileLink);
+
         if (!fileLink) {
           // TODO: proceed using axios to send the whole application data to endpoint
         }

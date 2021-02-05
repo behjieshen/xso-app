@@ -7,10 +7,11 @@
  */
 
 import { getSession } from "next-auth/client";
-import { Application, validationSchema } from "../../../models/Application";
+import Application from "../../../models/Application";
+import { applicationSchema } from "../../../models/validationSchema";
 import dbConnect from "../../../utils/mongodb";
 import User from "../../../models/User";
-import { isAuthenticated } from '../../../utils/isAuthenticated'
+import { isAuthenticated } from "../../../utils/isAuthenticated";
 
 export default async function handler(req, res) {
   /**
@@ -27,19 +28,17 @@ export default async function handler(req, res) {
     const session = await getSession({ req });
     let isCorrectUser = await isAuthenticated(req, "NEW USER");
     if (!isCorrectUser) {
-      res.status(404).send("Error");
-      return;
+      return res.status(401).send("Error");
     }
 
     // Check if user has submitted an application
-    let hasApplied;
     try {
       let application = await Application.findOne({
         email: session.user.email,
         // TODO: add cohort
       }).lean();
       if (application !== null) {
-        hasApplied = true;
+        return res.send("You have already submitted previously");
       }
     } catch (err) {
       console.log(err);
@@ -47,28 +46,27 @@ export default async function handler(req, res) {
       return;
     }
 
-    if (hasApplied) {
-      res.send("You have already submitted previously");
-      return;
-    }
-
     // Data validation
     let isDataValid = false;
     try {
-      isDataValid = await validationSchema.validate(req.body);
+      isDataValid = await applicationSchema.validate(req.body);
     } catch (err) {
       let errValidationResponse = {
         field: err.path,
         message: err.errors[0],
       };
-      res.status(400).send(errValidationResponse);
-      return;
+      console.log(errValidationResponse);
+      return res.status(400).send(errValidationResponse);
     }
 
     // Save into database
     if (isDataValid) {
       try {
-        const newApplication = new Application(req.body);
+        const newApplication = new Application({
+          ...req.body,
+          user: session.dbUser._id,
+        });
+
         await newApplication.save((err, application) => {
           if (err) {
             console.log(err);
@@ -149,5 +147,6 @@ export default async function handler(req, res) {
 //   "linkedinURL": "https://linkedin.com/",
 //   "resumeURL": "https://resume.com/",
 //   "youtubeIntroductionURL": "https://youtube.com/",
-//   "otherComments": "I love whales."
+//   "otherComments": "I love whales.",
+//   "status": "NEW APPLICATION"
 // }

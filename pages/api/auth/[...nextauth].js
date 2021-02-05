@@ -16,9 +16,7 @@ const options = {
 
       try {
         await dbConnect();
-        console.log("------------------");
         let user = await User.findOne({ email }).exec();
-        console.log(user);
         if (!user) {
           const newUser = new User({
             name,
@@ -52,7 +50,7 @@ const options = {
   },
 
   // Enable debug messages in the console if you are having problems
-  debug: true,
+  debug: false,
 };
 
 export default (req, res) => NextAuth(req, res, options);

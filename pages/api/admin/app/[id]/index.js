@@ -6,7 +6,7 @@
  *
  */
 
-import { Application } from "../../../../../models/Application";
+import Application from "../../../../../models/Application";
 import dbConnect from "../../../../../utils/mongodb";
 import { isAuthenticated } from "../../../../../utils/isAuthenticated";
 

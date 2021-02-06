@@ -66,7 +66,6 @@ export default async function handler(req, res) {
           ...req.body,
           user: session.dbUser._id,
         });
-
         await newApplication.save((err, application) => {
           if (err) {
             console.log(err);

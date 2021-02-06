@@ -5,7 +5,7 @@
  *
  */
 
-import { Application } from "../../../models/Application";
+import Application from "../../../models/Application";
 import dbConnect from "../../../utils/mongodb";
 import { Parser } from "json2csv";
 import moment from "moment";

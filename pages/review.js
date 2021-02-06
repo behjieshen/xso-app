@@ -22,9 +22,13 @@ export async function getServerSideProps(context) {
   await dbConnect();
   let app;
   try {
-    app = await Application.findOne({ user: session.dbUser._id }).then((res) =>
-      JSON.parse(JSON.stringify(res))
-    );
+    app = await Application.findOne({ user: session.dbUser._id }).then((res) => {
+      if (res !== null && typeof res !== "undefined") {
+        return JSON.parse(JSON.stringify(res));
+      } else {
+        return null;
+      }
+    });
   } catch (err) {
     console.log("user has not submitted an application");
     app = null;

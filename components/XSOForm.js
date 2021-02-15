@@ -1,7 +1,7 @@
 import axios from "axios";
-import { ErrorMessage, getIn, useFormik } from "formik";
+import { ErrorMessage, getIn, setNestedObjectValues, useFormik } from "formik";
 import { useSession } from "next-auth/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadFile } from "../utils/firebase";
 import { applicationSchema } from "../models/validationSchema";
 import { getNestedValueInObject } from "../utils/getNestedValueInObject";
@@ -9,47 +9,79 @@ import * as yup from "yup";
 import Input from "./form/Input";
 import isEmptyObject from "../utils/isEmptyObject";
 import { useRouter } from "next/router";
+import lodash from 'lodash';
+
 export default function XSOForm() {
   const [resumeData, setResumeData] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    location: "",
+    education: {
+      school: "",
+      studentStatus: "",
+      universityMajor: "",
+    },
+    cohort: "Fall 2020",
+    openQuestions: [
+      {
+        question: "Why are you looking to take a gap semester?*",
+        answer: "",
+      },
+      {
+        question: "What do you hope to gain from this program?*",
+        answer: "",
+      },
+      {
+        question: "What would you hope to learn from a Xoogler mentor?*",
+        answer: "",
+      },
+    ],
+    linkedinURL: "",
+    resumeURL: "",
+    resumeFile: "",
+    youtubeIntroductionURL: "",
+    otherComments: "",
+  });
+
+  const saveFormData = (key, value) => {
+    let newFormData = {
+      ...formData,
+    };
+    if(key.includes('.')) {
+      _.set(newFormData, key, value);
+    } else {
+      newFormData[key] = value;
+    }
+    setFormData(newFormData);
+    localStorage.setItem("formData", JSON.stringify(newFormData));
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("formData") !== null) {
+      setFormData(JSON.parse(localStorage.getItem("formData")));
+    }
+  }, [localStorage]);
+
   const [session] = useSession();
   const router = useRouter();
+  let initialValues = { email: session.user.email, image: session.user.image };
+  if (localStorage.getItem("formData") !== null) {
+    initialValues = { ...initialValues, ...JSON.parse(localStorage.getItem("formData")) };
+  } else {
+    initialValues = { ...initialValues, ...formData };
+  }
   const formik = useFormik({
     validationSchema: applicationSchema.concat(
       yup.object({
         resumeFile: yup.mixed().required("This field is required"),
       })
     ),
-    initialValues: {
-      fullName: "",
-      email: session.user.email,
-      location: "",
-      education: {
-        school: "",
-        studentStatus: "",
-        universityMajor: "",
-      },
-      cohort: "Fall 2020",
-      openQuestions: [
-        {
-          question: "Why are you looking to take a gap semester?*",
-          answer: "",
-        },
-        {
-          question: "What do you hope to gain from this program?*",
-          answer: "",
-        },
-        {
-          question: "What would you hope to learn from a Xoogler mentor?*",
-          answer: "",
-        },
-      ],
-      linkedinURL: "",
-      resumeURL: "",
-      resumeFile: "",
-      youtubeIntroductionURL: "",
-      otherComments: "",
-      image: session.user.image,
-    },
+    initialValues,
+    // initialValues: {
+    //   ...(JSON.parse(localStorage.getItem("formData")) || formData),
+    //   email: session.user.email,
+    //   image: session.user.image,
+    // },
     onSubmit: async (values, { resetForm }) => {
       const fileExtension = `.${resumeData.name.split(".")[1]}`;
       const fileName = values.fullName.replace(/\s/g, "_") + fileExtension;
@@ -98,13 +130,12 @@ export default function XSOForm() {
       >
         <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
           {/* Basic Info */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900">
-            Basic Info
-          </h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900">Basic Info</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Full Name */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Full Name"
               fieldName="fullName"
               required
@@ -113,6 +144,7 @@ export default function XSOForm() {
             {/* Location */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Location"
               fieldName="location"
               required
@@ -121,12 +153,11 @@ export default function XSOForm() {
             {/* What is your LinkedIn? (if you have one) */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Linkedin URL"
               fieldName="linkedinURL"
             >
-              <p className="text-xxs font-base text-gray-400">
-                (if you have one)
-              </p>
+              <p className="text-xxs font-base text-gray-400">(if you have one)</p>
             </Input>
 
             {/* Resume */}
@@ -152,8 +183,7 @@ export default function XSOForm() {
                     } rounded-md`}
                   >
                     <div className="space-y-1 text-center">
-                      {resumeData !== null &&
-                      typeof resumeData !== "undefined" ? (
+                      {resumeData !== null && typeof resumeData !== "undefined" ? (
                         <svg
                           className="mx-auto h-8 w-8 text-green-300"
                           xmlns="http://www.w3.org/2000/svg"
@@ -187,8 +217,7 @@ export default function XSOForm() {
 
                       <div className="flex text-sm text-gray-600 flex-col flex items-center">
                         <span>
-                          {resumeData !== null &&
-                          typeof resumeData !== "undefined"
+                          {resumeData !== null && typeof resumeData !== "undefined"
                             ? resumeData.name
                             : "Upload a file"}
                         </span>
@@ -198,20 +227,14 @@ export default function XSOForm() {
                           type="file"
                           onChange={(e) => {
                             setResumeData(e.target.files[0]);
-                            formik.setFieldValue(
-                              "resumeFile",
-                              e.target.files[0].name
-                            );
+                            formik.setFieldValue("resumeFile", e.target.files[0].name);
                           }}
                           className="sr-only"
                           accept=".doc, .docx, .pdf"
                         />
                       </div>
-                      {resumeData !== null &&
-                      typeof resumeData !== "undefined" ? null : (
-                        <p className="text-xs text-gray-500">
-                          .pdf or .docx only
-                        </p>
+                      {resumeData !== null && typeof resumeData !== "undefined" ? null : (
+                        <p className="text-xs text-gray-500">.pdf or .docx only</p>
                       )}
                     </div>
                   </div>
@@ -222,13 +245,12 @@ export default function XSOForm() {
           </div>
 
           {/* Education */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">
-            Education
-          </h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Education</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Where do you currently (or did you) go to school? */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="School"
               fieldName="education.school"
               required
@@ -237,6 +259,7 @@ export default function XSOForm() {
             {/* Major */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Major"
               fieldName="education.universityMajor"
               required
@@ -264,18 +287,16 @@ export default function XSOForm() {
                         <input
                           id="studentStatus"
                           name="education.studentStatus"
-                          onChange={formik.handleChange}
+                          checked={getNestedValueInObject('education.studentStatus',formData) === status ? "checked" : ''}
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                            saveFormData("education.studentStatus", status);
+                          }}
                           value={status}
                           type="radio"
                           className={`focus-within:outline-none h-4 w-4 text-indigo-600 ${
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.errors
-                            ) &&
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.touched
-                            )
+                            getNestedValueInObject("education.studentStatus", formik.errors) &&
+                            getNestedValueInObject("education.studentStatus", formik.touched)
                               ? "border-red-500"
                               : "border-gray-300"
                           }`}
@@ -283,14 +304,8 @@ export default function XSOForm() {
                         <label
                           htmlFor="studentStatus"
                           className={`ml-3 block text-sm ${
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.errors
-                            ) &&
-                            getNestedValueInObject(
-                              "education.studentStatus",
-                              formik.touched
-                            )
+                            getNestedValueInObject("education.studentStatus", formik.errors) &&
+                            getNestedValueInObject("education.studentStatus", formik.touched)
                               ? "text-red-500"
                               : "text-gray-700"
                           }`}
@@ -307,15 +322,15 @@ export default function XSOForm() {
           </div>
 
           {/* Get To Know You! */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">
-            Get To Know You!
-          </h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Get To Know You!</h3>
           <div className="space-y-6 sm:space-y-5">
             {/* Youtube Introduction Video */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Youtube Introduction URL"
               fieldName="youtubeIntroductionURL"
+              required
             >
               <p className="text-xxs font-base text-gray-400">
                 Record a 1 minute video to introduce yourself!
@@ -334,8 +349,7 @@ export default function XSOForm() {
                 5. Where do you want to be in 5-10 years time
                 <br />
                 <br />
-                You are allowed to make the video private, but please ensure the
-                link is working.
+                You are allowed to make the video private, but please ensure the link is working.
               </p>
             </Input>
             {/* Open Questions */}
@@ -343,6 +357,7 @@ export default function XSOForm() {
               <Input
                 key={index}
                 formik={formik}
+                saveFormData={saveFormData}
                 displayName={response.question}
                 fieldName={`openQuestions.${index}.answer`}
                 type="textarea"
@@ -352,6 +367,7 @@ export default function XSOForm() {
             {/* Other Comments */}
             <Input
               formik={formik}
+              saveFormData={saveFormData}
               displayName="Do you have any comments?"
               fieldName="otherComments"
               type="textarea"
@@ -362,9 +378,7 @@ export default function XSOForm() {
         <div className="pt-5">
           <div className="flex justify-end items-center">
             {!isEmptyObject(formik.errors) && !isEmptyObject(formik.touched) ? (
-              <p className="text-red-500 mr-5">
-                * Please fill up all required elements
-              </p>
+              <p className="text-red-500 mr-5">* Please fill up all required elements</p>
             ) : null}
             <button
               type="button"

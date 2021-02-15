@@ -82,8 +82,8 @@ export default async function handler(req, res) {
       `attachment;filename=${moment().format("MMDDYYYY")}_XSO_APPLICATIONS.csv`
     );
 
-    res.status(200).send(csvData);
+    return res.status(200).send(csvData);
   } else {
-    res.status(404).send("Error");
+    return res.status(404).send("Error");
   }
 }

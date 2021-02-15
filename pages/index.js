@@ -1,6 +1,26 @@
 import MainLayout from "../layout/MainLayout";
 import Status from "../components/Status";
+import { useSession } from "next-auth/client";
+import Router from "next/router";
+
 export default function Index() {
+  const [session, loading] = useSession();
+
+  // Redirect user to home page for non-admins
+  if (!loading && session) {
+    if (session.dbUser.role === "ADMIN") {
+      Router.push(process.env.NEXTAUTH_URL + "/admin");
+    }
+  }
+
+  // Display null while redirecting
+  if (
+    !loading &&
+    session.dbUser.role === "ADMIN"
+  ) {
+    return <></>;
+  }
+
   return (
     <div className="flex flex-col w-0 flex-1 overflow-hidden">
       <main

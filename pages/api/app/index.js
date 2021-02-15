@@ -12,6 +12,7 @@ import { applicationSchema } from "../../../models/validationSchema";
 import dbConnect from "../../../utils/mongodb";
 import User from "../../../models/User";
 import { isAuthenticated } from "../../../utils/isAuthenticated";
+import mongoose from "mongoose";
 
 export default async function handler(req, res) {
   /**
@@ -31,66 +32,61 @@ export default async function handler(req, res) {
       return res.status(401).send("Error");
     }
 
-    // Check if user has submitted an application
+    // Begin Transaction Session
+    const dbSession = await mongoose.startSession();
+
     try {
+      await dbSession.startTransaction();
+
+      // Make sure that application does not exist
       let application = await Application.findOne({
         email: session.user.email,
         // TODO: add cohort
       }).lean();
       if (application !== null) {
-        return res.send("You have already submitted previously");
+        throw new Error(
+          `An application have already been submitted previously by ${session.user.email}`
+        );
       }
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("Error");
-      return;
-    }
 
-    // Data validation
-    let isDataValid = false;
-    try {
+      // Validate application data
+      let isDataValid = false;
+
       isDataValid = await applicationSchema.validate(req.body);
-    } catch (err) {
-      let errValidationResponse = {
-        field: err.path,
-        message: err.errors[0],
-      };
-      console.log(errValidationResponse);
-      return res.status(400).send(errValidationResponse);
-    }
 
-    // Save into database
-    if (isDataValid) {
-      try {
-        const newApplication = new Application({
+      if (isDataValid) {
+
+        // Create new application entry into db
+        Application.create([{
           ...req.body,
           user: session.dbUser._id,
-        });
-        await newApplication.save((err, application) => {
-          if (err) {
-            console.log(err);
-            res.send(400).send("Error");
-            return;
-          }
-        });
-      } catch (err) {
-        console.log(err);
-        res.status(400).send("Error");
-        return;
-      }
+        }], { session: dbSession });
 
-      try {
-        await User.findOneAndUpdate(
-          { _id: session.dbUser._id },
-          { role: "APPLICANT" }
-        );
-      } catch (err) {
-        console.log(err);
-        res.status(400).send("Error");
-        return;
-      }
+        // Update user to "Applicant" status
+        await User.findOneAndUpdate({ _id: session.dbUser._id }, { role: "APPLICANT" }).session(dbSession);
 
-      res.send("Application is successful");
+        // Complete transaction
+        await dbSession.commitTransaction();
+        dbSession.endSession();
+
+        return res.send("Application is successful");
+      } 
+    } catch (err) {
+      // Abort and rollback transaction if error
+      await dbSession.abortTransaction();
+      dbSession.endSession();
+      
+      // Log validation schema errors if possible, else log the usual errors
+      if(typeof err.path !== 'undefined' && typeof err.message !== 'undefined') {
+        let errValidationResponse = {
+          field: err.path,
+          message: err.errors[0],
+        };
+        console.log(errValidationResponse);
+      } else {
+        console.log(err);
+      }
+      return res.status(400).send("An error has occured");
     }
 
     /**

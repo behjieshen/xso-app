@@ -36,10 +36,10 @@ export default async function handler(req, res) {
     // Get all data from MongoDB
     try {
       let data = await Application.findOne({ _id: id }).lean();
-      res.status(200).send(data);
+      return res.status(200).send(data);
     } catch (err) {
       console.log(err);
-      res.status(400).send("Error");
+      return res.status(400).send("Error");
     }
 
     /**
@@ -55,12 +55,12 @@ export default async function handler(req, res) {
     // Delete application
     try {
       await Application.findOneAndDelete({ _id: id }).lean();
-      res.status(200).send("Deleted Successfully");
+      return res.status(200).send("Deleted Successfully");
     } catch (err) {
       console.log(err);
-      res.status(400).send("Error");
+      return res.status(400).send("Error");
     }
   } else {
-    res.status(400).send("Error");
+    return res.status(400).send("Error");
   }
 }

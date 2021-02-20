@@ -9,7 +9,7 @@ import * as yup from "yup";
 import Input from "./form/Input";
 import isEmptyObject from "../utils/isEmptyObject";
 import { useRouter } from "next/router";
-import lodash from 'lodash';
+import lodash from "lodash";
 
 export default function XSOForm() {
   const [resumeData, setResumeData] = useState(null);
@@ -47,7 +47,7 @@ export default function XSOForm() {
     let newFormData = {
       ...formData,
     };
-    if(key.includes('.')) {
+    if (key.includes(".")) {
       _.set(newFormData, key, value);
     } else {
       newFormData[key] = value;
@@ -73,7 +73,7 @@ export default function XSOForm() {
   const formik = useFormik({
     validationSchema: applicationSchema.concat(
       yup.object({
-        resumeFile: yup.mixed().required("This field is required"),
+        resumeFile: yup.mixed().required("*This field is required"),
       })
     ),
     initialValues,
@@ -96,6 +96,7 @@ export default function XSOForm() {
         values["resumeURL"] = fileLink;
         try {
           let { data } = await axios.post("/api/app", values);
+          localStorage.removeItem("formData");
           console.log(data);
           router.push("/");
         } catch (err) {
@@ -122,16 +123,16 @@ export default function XSOForm() {
   };
 
   return (
-    <div className="px-20 py-16">
+    <div className="px-6 py-8 lg:px-20 lg:py-16">
       <form
         encType="multipart/form-data"
-        className="space-y-8 divide-y divide-gray-200"
+        className="space-y-8 divide-gray-200"
         onSubmit={formik.handleSubmit}
       >
-        <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+        <div className="space-y-5 divide-gray-200 lg:space-y-6">
           {/* Basic Info */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900">Basic Info</h3>
-          <div className="space-y-6 sm:space-y-5">
+          <h3 className="leading-6 font-medium text-xl text-gray-900 border-b pb-5">Basic Info</h3>
+          <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Full Name */}
             <Input
               formik={formik}
@@ -157,14 +158,28 @@ export default function XSOForm() {
               displayName="Linkedin URL"
               fieldName="linkedinURL"
             >
-              <p className="text-xxs font-base text-gray-400">(if you have one)</p>
+              <p
+                className={`text-xxs font-base  ${
+                  getNestedValueInObject("linkedinURL", formik.errors) &&
+                  getNestedValueInObject("linkedinURL", formik.touched)
+                    ? "text-red-400"
+                    : "text-gray-400"
+                } `}
+              >
+                (if you have one)
+              </p>
             </Input>
 
             {/* Resume */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
               <label
                 htmlFor="resume"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+                  getNestedValueInObject("resumeFile", formik.errors) &&
+                  getNestedValueInObject("resumeFile", formik.touched)
+                    ? "text-red-500"
+                    : "text-gray-700"
+                }`}
               >
                 Resume*
               </label>
@@ -200,7 +215,12 @@ export default function XSOForm() {
                         </svg>
                       ) : (
                         <svg
-                          className="mx-auto h-8 w-8 text-gray-300"
+                          className={`mx-auto h-8 w-8  ${
+                            getNestedValueInObject("resumeFile", formik.errors) &&
+                            getNestedValueInObject("resumeFile", formik.touched)
+                              ? "text-red-400"
+                              : "text-gray-300"
+                          }`}
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -215,7 +235,14 @@ export default function XSOForm() {
                         </svg>
                       )}
 
-                      <div className="flex text-sm text-gray-600 flex-col flex items-center">
+                      <div
+                        className={`flex text-sm ${
+                          getNestedValueInObject("resumeFile", formik.errors) &&
+                          getNestedValueInObject("resumeFile", formik.touched)
+                            ? "text-red-500"
+                            : "text-gray-600"
+                        } flex-col flex items-center`}
+                      >
                         <span>
                           {resumeData !== null && typeof resumeData !== "undefined"
                             ? resumeData.name
@@ -234,7 +261,16 @@ export default function XSOForm() {
                         />
                       </div>
                       {resumeData !== null && typeof resumeData !== "undefined" ? null : (
-                        <p className="text-xs text-gray-500">.pdf or .docx only</p>
+                        <p
+                          className={`text-xs  ${
+                            getNestedValueInObject("resumeFile", formik.errors) &&
+                            getNestedValueInObject("resumeFile", formik.touched)
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          .pdf or .docx only
+                        </p>
                       )}
                     </div>
                   </div>
@@ -245,8 +281,8 @@ export default function XSOForm() {
           </div>
 
           {/* Education */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Education</h3>
-          <div className="space-y-6 sm:space-y-5">
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">Education</h3>
+          <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Where do you currently (or did you) go to school? */}
             <Input
               formik={formik}
@@ -266,10 +302,15 @@ export default function XSOForm() {
             />
 
             {/* Student Status */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+            <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
               <label
                 htmlFor="country"
-                className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+                  getNestedValueInObject("education.studentStatus", formik.errors) &&
+                  getNestedValueInObject("education.studentStatus", formik.touched)
+                    ? "text-red-500"
+                    : "text-gray-700"
+                }`}
               >
                 Student Status*
               </label>
@@ -287,7 +328,11 @@ export default function XSOForm() {
                         <input
                           id="studentStatus"
                           name="education.studentStatus"
-                          checked={getNestedValueInObject('education.studentStatus',formData) === status ? "checked" : ''}
+                          checked={
+                            getNestedValueInObject("education.studentStatus", formData) === status
+                              ? "checked"
+                              : ""
+                          }
                           onChange={(e) => {
                             formik.handleChange(e);
                             saveFormData("education.studentStatus", status);
@@ -322,8 +367,8 @@ export default function XSOForm() {
           </div>
 
           {/* Get To Know You! */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12">Get To Know You!</h3>
-          <div className="space-y-6 sm:space-y-5">
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">Get To Know You!</h3>
+          <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Youtube Introduction Video */}
             <Input
               formik={formik}
@@ -332,7 +377,14 @@ export default function XSOForm() {
               fieldName="youtubeIntroductionURL"
               required
             >
-              <p className="text-xxs font-base text-gray-400">
+              <p
+                className={`text-xxs font-base  ${
+                  getNestedValueInObject("youtubeIntroductionURL", formik.errors) &&
+                  getNestedValueInObject("youtubeIntroductionURL", formik.touched)
+                    ? "text-red-400"
+                    : "text-gray-400"
+                } `}
+              >
                 Record a 1 minute video to introduce yourself!
                 <br />
                 <br />
@@ -376,19 +428,21 @@ export default function XSOForm() {
         </div>
 
         <div className="pt-5">
-          <div className="flex justify-end items-center">
+          <div className="flex flex-col  md:flex-row md:justify-end items-center">
             {!isEmptyObject(formik.errors) && !isEmptyObject(formik.touched) ? (
-              <p className="text-red-500 mr-5">* Please fill up all required elements</p>
+              <p className="text-red-500 mr-5 mb-5 md:mb-0">
+                * Please fill up all required elements
+              </p>
             ) : null}
             <button
               type="button"
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus-within:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="bg-white mb-3 w-full py-2 md:mb-0 md:w-auto md:px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus-within:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus-within:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="md:ml-3 inline-flex justify-center w-full py-2 md:w-auto md:px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus-within:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Submit
             </button>

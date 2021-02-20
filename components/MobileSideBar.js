@@ -33,9 +33,11 @@ export default function MobileSideBar({ image, name, sideBarVisible, setSideBarV
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
           className="fixed inset-0"
-          aria-hidden="true"
         >
-          <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
+          <div
+            className="absolute inset-0 bg-gray-600 opacity-75"
+            onClick={() => setSideBarVisible(false)}
+          ></div>
         </Transition>
         {/* <div className="fixed inset-0" aria-hidden="true">
             

@@ -326,7 +326,7 @@ export default function XSOForm() {
                     ].map((status, index) => (
                       <div className="flex items-center py-2" key={index}>
                         <input
-                          id="studentStatus"
+                          id={status}
                           name="education.studentStatus"
                           checked={
                             getNestedValueInObject("education.studentStatus", formData) === status
@@ -347,7 +347,7 @@ export default function XSOForm() {
                           }`}
                         />
                         <label
-                          htmlFor="studentStatus"
+                          htmlFor={status}
                           className={`ml-3 block text-sm ${
                             getNestedValueInObject("education.studentStatus", formik.errors) &&
                             getNestedValueInObject("education.studentStatus", formik.touched)

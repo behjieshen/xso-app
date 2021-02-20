@@ -19,7 +19,12 @@ export default function Input({ formik, fieldName, displayName, required, childr
     <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
       <label
         htmlFor={fieldName}
-        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+        className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+          getNestedValueInObject(fieldName, formik.errors) &&
+          getNestedValueInObject(fieldName, formik.touched)
+            ? "text-red-500"
+            : "text-gray-700"
+        }`}
       >
         {displayName}
         {typeof required !== "undefined" && required ? "*" : null}

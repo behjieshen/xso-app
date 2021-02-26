@@ -24,10 +24,6 @@ export default function XSOForm() {
     cohort: "Fall 2020",
     openQuestions: [
       {
-        question: "Why are you looking to take a gap semester?*",
-        answer: "",
-      },
-      {
         question: "What do you hope to gain from this program?*",
         answer: "",
       },
@@ -66,7 +62,10 @@ export default function XSOForm() {
   const router = useRouter();
   let initialValues = { email: session.user.email, image: session.user.image };
   if (localStorage.getItem("formData") !== null) {
-    initialValues = { ...initialValues, ...JSON.parse(localStorage.getItem("formData")) };
+    initialValues = {
+      ...initialValues,
+      ...JSON.parse(localStorage.getItem("formData")),
+    };
   } else {
     initialValues = { ...initialValues, ...formData };
   }
@@ -131,7 +130,9 @@ export default function XSOForm() {
       >
         <div className="space-y-5 divide-gray-200 lg:space-y-6">
           {/* Basic Info */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 border-b pb-5">Basic Info</h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900 border-b pb-5">
+            Basic Info
+          </h3>
           <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Full Name */}
             <Input
@@ -198,7 +199,8 @@ export default function XSOForm() {
                     } rounded-md`}
                   >
                     <div className="space-y-1 text-center">
-                      {resumeData !== null && typeof resumeData !== "undefined" ? (
+                      {resumeData !== null &&
+                      typeof resumeData !== "undefined" ? (
                         <svg
                           className="mx-auto h-8 w-8 text-green-300"
                           xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +218,10 @@ export default function XSOForm() {
                       ) : (
                         <svg
                           className={`mx-auto h-8 w-8  ${
-                            getNestedValueInObject("resumeFile", formik.errors) &&
+                            getNestedValueInObject(
+                              "resumeFile",
+                              formik.errors
+                            ) &&
                             getNestedValueInObject("resumeFile", formik.touched)
                               ? "text-red-400"
                               : "text-gray-300"
@@ -244,7 +249,8 @@ export default function XSOForm() {
                         } flex-col flex items-center`}
                       >
                         <span>
-                          {resumeData !== null && typeof resumeData !== "undefined"
+                          {resumeData !== null &&
+                          typeof resumeData !== "undefined"
                             ? resumeData.name
                             : "Upload a file"}
                         </span>
@@ -254,16 +260,23 @@ export default function XSOForm() {
                           type="file"
                           onChange={(e) => {
                             setResumeData(e.target.files[0]);
-                            formik.setFieldValue("resumeFile", e.target.files[0].name);
+                            formik.setFieldValue(
+                              "resumeFile",
+                              e.target.files[0].name
+                            );
                           }}
                           className="sr-only"
                           accept=".doc, .docx, .pdf"
                         />
                       </div>
-                      {resumeData !== null && typeof resumeData !== "undefined" ? null : (
+                      {resumeData !== null &&
+                      typeof resumeData !== "undefined" ? null : (
                         <p
                           className={`text-xs  ${
-                            getNestedValueInObject("resumeFile", formik.errors) &&
+                            getNestedValueInObject(
+                              "resumeFile",
+                              formik.errors
+                            ) &&
                             getNestedValueInObject("resumeFile", formik.touched)
                               ? "text-red-500"
                               : "text-gray-500"
@@ -281,7 +294,9 @@ export default function XSOForm() {
           </div>
 
           {/* Education */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">Education</h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">
+            Education
+          </h3>
           <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Where do you currently (or did you) go to school? */}
             <Input
@@ -306,8 +321,14 @@ export default function XSOForm() {
               <label
                 htmlFor="country"
                 className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
-                  getNestedValueInObject("education.studentStatus", formik.errors) &&
-                  getNestedValueInObject("education.studentStatus", formik.touched)
+                  getNestedValueInObject(
+                    "education.studentStatus",
+                    formik.errors
+                  ) &&
+                  getNestedValueInObject(
+                    "education.studentStatus",
+                    formik.touched
+                  )
                     ? "text-red-500"
                     : "text-gray-700"
                 }`}
@@ -323,13 +344,18 @@ export default function XSOForm() {
                       "College Sophomore",
                       "College Junior",
                       "College Senior",
+                      "College Graduate",
+                      "Master's Student",
                     ].map((status, index) => (
                       <div className="flex items-center py-2" key={index}>
                         <input
                           id={status}
                           name="education.studentStatus"
                           checked={
-                            getNestedValueInObject("education.studentStatus", formData) === status
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formData
+                            ) === status
                               ? "checked"
                               : ""
                           }
@@ -340,8 +366,14 @@ export default function XSOForm() {
                           value={status}
                           type="radio"
                           className={`focus-within:outline-none h-4 w-4 text-indigo-600 ${
-                            getNestedValueInObject("education.studentStatus", formik.errors) &&
-                            getNestedValueInObject("education.studentStatus", formik.touched)
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.errors
+                            ) &&
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.touched
+                            )
                               ? "border-red-500"
                               : "border-gray-300"
                           }`}
@@ -349,8 +381,14 @@ export default function XSOForm() {
                         <label
                           htmlFor={status}
                           className={`ml-3 block text-sm ${
-                            getNestedValueInObject("education.studentStatus", formik.errors) &&
-                            getNestedValueInObject("education.studentStatus", formik.touched)
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.errors
+                            ) &&
+                            getNestedValueInObject(
+                              "education.studentStatus",
+                              formik.touched
+                            )
                               ? "text-red-500"
                               : "text-gray-700"
                           }`}
@@ -367,7 +405,9 @@ export default function XSOForm() {
           </div>
 
           {/* Get To Know You! */}
-          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">Get To Know You!</h3>
+          <h3 className="leading-6 font-medium text-xl text-gray-900 pt-12 border-b pb-5">
+            Get To Know You!
+          </h3>
           <div className="space-y-8 lg:space-y-5 pt-5 lg:pt-0">
             {/* Youtube Introduction Video */}
             <Input
@@ -379,8 +419,14 @@ export default function XSOForm() {
             >
               <p
                 className={`text-xxs font-base  ${
-                  getNestedValueInObject("youtubeIntroductionURL", formik.errors) &&
-                  getNestedValueInObject("youtubeIntroductionURL", formik.touched)
+                  getNestedValueInObject(
+                    "youtubeIntroductionURL",
+                    formik.errors
+                  ) &&
+                  getNestedValueInObject(
+                    "youtubeIntroductionURL",
+                    formik.touched
+                  )
                     ? "text-red-400"
                     : "text-gray-400"
                 } `}
@@ -401,7 +447,8 @@ export default function XSOForm() {
                 5. Where do you want to be in 5-10 years time
                 <br />
                 <br />
-                You are allowed to make the video private, but please ensure the link is working.
+                You are allowed to make the video private, but please ensure the
+                link is working.
               </p>
             </Input>
             {/* Open Questions */}
@@ -420,7 +467,7 @@ export default function XSOForm() {
             <Input
               formik={formik}
               saveFormData={saveFormData}
-              displayName="Do you have any comments?"
+              displayName="Is there anything else that you'd like to share?"
               fieldName="otherComments"
               type="textarea"
             />

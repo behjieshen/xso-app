@@ -55,29 +55,39 @@ export default async function handler(req, res) {
       isDataValid = await applicationSchema.validate(req.body);
 
       if (isDataValid) {
-
         // Create new application entry into db
-        Application.create([{
-          ...req.body,
-          user: session.dbUser._id,
-        }], { session: dbSession });
+        Application.create(
+          [
+            {
+              ...req.body,
+              user: session.dbUser._id,
+            },
+          ],
+          { session: dbSession }
+        );
 
         // Update user to "Applicant" status
-        await User.findOneAndUpdate({ _id: session.dbUser._id }, { role: "APPLICANT" }).session(dbSession);
+        await User.findOneAndUpdate(
+          { _id: session.dbUser._id },
+          { role: "APPLICANT" }
+        ).session(dbSession);
 
         // Complete transaction
         await dbSession.commitTransaction();
         dbSession.endSession();
 
         return res.send("Application is successful");
-      } 
+      }
     } catch (err) {
       // Abort and rollback transaction if error
       await dbSession.abortTransaction();
       dbSession.endSession();
-      
+
       // Log validation schema errors if possible, else log the usual errors
-      if(typeof err.path !== 'undefined' && typeof err.message !== 'undefined') {
+      if (
+        typeof err.path !== "undefined" &&
+        typeof err.message !== "undefined"
+      ) {
         let errValidationResponse = {
           field: err.path,
           message: err.errors[0],

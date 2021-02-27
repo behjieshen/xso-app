@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 // ref link: https://forms.gle/yUjCGbLZwKrKdj698
 let applicationSchema = new mongoose.Schema({
@@ -33,6 +34,8 @@ let applicationSchema = new mongoose.Schema({
   },
   image: String,
 });
+
+applicationSchema.plugin(mongoosePaginate);
 
 export default mongoose.models.Application ||
   mongoose.model("Application", applicationSchema);

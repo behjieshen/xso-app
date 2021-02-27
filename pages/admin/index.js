@@ -9,6 +9,7 @@ import Router from "next/router";
 import Loading from "../../components/utils/Loading";
 import DetailedView from "../../components/admin/DetailedView";
 import Overview from "../../components/admin/Overview";
+import ApplicationsPaginations from "../../components/admin/ApplicationsPagination";
 
 export default function Index() {
   const [session, loading] = useSession();
@@ -19,6 +20,10 @@ export default function Index() {
     data: {},
     index: null,
   });
+  const [paginationPage, setPaginationPage] = useState(
+    localStorage.getItem("adminApplicationsCurrPage") || 1
+  );
+  const [paginationData, setPaginationData] = useState({});
 
   // Redirect user to home page for non-admins
   if (!loading && session) {
@@ -27,49 +32,45 @@ export default function Index() {
     }
   }
 
-  // Use Axios to fetch data
-  const fetcher = (url) =>
-    axios.get(url).then((res) => {
-      // Compute overview
-      let overviewData = {
-        accepted: 0,
-        rejected: 0,
-        unlabelled: 0,
-        total: 0,
-      };
-      res.data.map((application) => {
-        if (application.status === "REJECTED") overviewData.rejected += 1;
-        if (application.status === "ACCEPTED") overviewData.accepted += 1;
-        if (application.status === "NEW APPLICATION")
-          overviewData.unlabelled += 1;
-        overviewData.total += 1;
-      });
-      // return as { data } in useSWR
-      return {
-        applicationsData: res.data,
-        overviewData,
-      };
-    });
-
   // Retrieve applications data from API
-  const { data, error } = useSWR("/api/admin/app", fetcher);
+  const { data: applicationsAPIData, error: applicationsError } = useSWR(
+    `/api/admin/app?page=${paginationPage}`
+  );
+  const { data: overviewAPIData, error: overviewError } = useSWR(`/api/admin/app/overview-data`);
+
+  useEffect(() => {
+    if (typeof overviewAPIData !== "undefined") {
+      setOverviewData(overviewAPIData.data);
+    }
+  }, [overviewAPIData]);
 
   // Set state once API call returns data
   useEffect(() => {
-    if (typeof data !== "undefined") {
-      setOverviewData(data.overviewData);
-      setApplicationsData(data.applicationsData);
+    if (typeof applicationsAPIData !== "undefined") {
+      setApplicationsData(applicationsAPIData.data);
+      setPaginationData(applicationsAPIData.paginationData);
     }
-  }, [data]);
+  }, [applicationsAPIData]);
 
   // Handle loading and error in API call
-  if (error) return <div>Error Loading Data</div>;
-  if (!data) return <Loading />;
+  if (applicationsError || overviewError) return <div>Error Loading Data</div>;
+  if (!applicationsAPIData && overviewAPIData)
+    return (
+      <div className="flex flex-col w-0 flex-1">
+        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none" tabIndex="0">
+          <Header />
+          <Overview overviewData={overviewData} />
+          <Loading small />
+        </main>
+      </div>
+    );
+  if (!applicationsAPIData || !overviewAPIData) return <Loading />;
 
   // Update applicationsData state (to be passed as props)
   const updateData = (originalData, updatedApplication, index) => {
     let updatedData = originalData;
-    updatedData[index] = updatedApplication;
+    let nonPaginatedIndex = index - (paginationData.page - 1) * paginationData.limit;
+    updatedData[nonPaginatedIndex] = updatedApplication;
     setApplicationsData(updatedData);
   };
 
@@ -112,11 +113,7 @@ export default function Index() {
   // 2. If request for detail view, show detailed application view
   // 3. Else display default admin overview and table page
 
-  if (
-    !loading &&
-    session !== typeof "undefined" &&
-    session.dbUser.role !== "ADMIN"
-  ) {
+  if (!loading && session !== typeof "undefined" && session.dbUser.role !== "ADMIN") {
     return <></>;
   } else if (showDetailView)
     return (
@@ -133,10 +130,7 @@ export default function Index() {
   else {
     return (
       <div className="flex flex-col w-0 flex-1">
-        <main
-          className="flex-1 relative z-0 overflow-y-auto focus:outline-none"
-          tabIndex="0"
-        >
+        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none" tabIndex="0">
           <Header />
           <Overview overviewData={overviewData} />
           <ApplicationsTable
@@ -145,6 +139,11 @@ export default function Index() {
             setShowDetailView={setShowDetailView}
             updateOverview={updateOverview}
             updateData={updateData}
+            paginationData={paginationData}
+          />
+          <ApplicationsPaginations
+            paginationData={paginationData}
+            setPaginationPage={setPaginationPage}
           />
         </main>
       </div>

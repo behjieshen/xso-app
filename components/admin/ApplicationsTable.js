@@ -5,7 +5,8 @@ export default function ApplicationsTable({
   setDetailViewData,
   setShowDetailView,
   updateOverview,
-  updateData
+  updateData,
+  paginationData
 }) {
   return (
     <div className="block mt-8">
@@ -36,11 +37,12 @@ export default function ApplicationsTable({
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {typeof data !== 'undefined' && data.map((application, index) => {
+              let currentPaginationIndex = index + ((paginationData.page - 1) * paginationData.limit);
               return (
                 <ApplicationsTableRow
                   key={application._id}
                   data={application}
-                  index={index}
+                  index={currentPaginationIndex}
                   setDetailViewData={setDetailViewData}
                   setShowDetailView={setShowDetailView}
                   updateOverview={updateOverview}

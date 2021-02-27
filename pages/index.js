@@ -9,7 +9,7 @@ export default function Index({ setSideBarVisible }) {
   // Redirect user to home page for non-admins
   if (!loading && session) {
     if (session.dbUser.role === "ADMIN") {
-      Router.push(process.env.NEXTAUTH_URL + "/admin");
+      Router.push(process.env.NEXTAUTH_URL + "admin");
     }
   }
 

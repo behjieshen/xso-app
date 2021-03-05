@@ -11,10 +11,10 @@ import { isAuthenticated } from "../../../../utils/isAuthenticated";
 
 export default async function handler(req, res) {
   // Check if user is admin
-  let isCorrectUser = await isAuthenticated(req, "ADMIN");
-  if (!isCorrectUser) {
-    return res.status(401).send("not authenticated");
-  }
+    let isCorrectUser = await isAuthenticated(req, "ADMIN");
+    if (!isCorrectUser) {
+      return res.status(401).send("not authenticated");
+    }
 
   /**
    * [GET] - Get all applications
@@ -27,25 +27,18 @@ export default async function handler(req, res) {
 
     // Find all applications
     try {
-      const options = {
-        page: req.query.page || 1,
-        limit: 10,
-        lean: true,
-        sort: 'createdAt',
-        collation: {
-          locale: 'en',
-        },
+      let accepted = await Application.countDocuments({ status: "ACCEPTED" });
+      let rejected = await Application.countDocuments({ status: "REJECTED" });
+      let unlabelled = await Application.countDocuments({ status: "NEW APPLICATION" });
+
+      let overviewData = {
+        accepted,
+        rejected,
+        unlabelled,
+        total: accepted + rejected + unlabelled,
       };
 
-      let data = await Application.paginate({}, options);
-      
-      let paginationData = {...data};
-      delete paginationData.docs;
-
-      return res.status(200).send({
-        data: data.docs,
-        paginationData
-      });
+      return res.status(200).send({ data: overviewData });
     } catch (err) {
       console.log(err);
       return res.status(400).send("Error");

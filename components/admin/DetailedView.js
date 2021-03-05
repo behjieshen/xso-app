@@ -15,18 +15,14 @@ export default function DetailedView({
   setShowDetailView,
   updateOverview,
   updateData,
-  index
+  index,
 }) {
   const [session, loading] = useSession();
 
   if (!loading && !session) return <div>Error</div>;
 
-  const [activeAcceptButton, setActiveAcceptButton] = useState(
-    data.status === "ACCEPTED"
-  );
-  const [activeRejectButton, setActiveRejectButton] = useState(
-    data.status === "REJECTED"
-  );
+  const [activeAcceptButton, setActiveAcceptButton] = useState(data.status === "ACCEPTED");
+  const [activeRejectButton, setActiveRejectButton] = useState(data.status === "REJECTED");
 
   const { _id: id, status } = data;
 
@@ -53,41 +49,39 @@ export default function DetailedView({
             <div className="flex-shrink-0">
               <div className="relative">
                 <img className="h-16 w-16 rounded-full" src={data.image} />
-                <span
-                  className="absolute inset-0 shadow-inner rounded-full"
-                  aria-hidden="true"
-                />
+                <span className="absolute inset-0 shadow-inner rounded-full" aria-hidden="true" />
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {data.fullName}
-              </h1>
+              <h1 className="text-2xl font-bold text-gray-900">{data.fullName}</h1>
               <p className="text-sm font-medium text-gray-500">
-                Applied on{" "}
-                {moment(data.createdAt).format("MMMM Do YYYY, hh:mm:ss Z")}
+                Applied on {moment(data.createdAt).format("MMMM Do YYYY, hh:mm:ss Z")}
               </p>
             </div>
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
             <button
               onClick={async () => {
-                // Update overviewData state
-                updateOverview("accepted", status === "NEW APPLICATION");
 
-                // Update application state
-                let newApplicationData = { ...data, status: "ACCEPTED" };
-                updateData(newApplicationData, index);
+                // Only allow state change if accept button is not clicked
+                if (!activeAcceptButton) {
+                  // Update overviewData state
+                  updateOverview("accepted", status === "NEW APPLICATION");
 
-                // Adjust state for accept/reject buttons
-                setActiveAcceptButton(true);
-                setActiveRejectButton(false);
+                  // Update application state
+                  let newApplicationData = { ...data, status: "ACCEPTED" };
+                  updateData(newApplicationData, index);
 
-                // Update database in the background after UI changes are made
-                try {
-                  await axios.put(`/api/admin/app/${id}/accept`);
-                } catch (err) {
-                  console.log(err);
+                  // Adjust state for accept/reject buttons
+                  setActiveAcceptButton(true);
+                  setActiveRejectButton(false);
+
+                  // Update database in the background after UI changes are made
+                  try {
+                    await axios.put(`/api/admin/app/${id}/accept`);
+                  } catch (err) {
+                    console.log(err);
+                  }
                 }
               }}
               type="submit"
@@ -101,29 +95,31 @@ export default function DetailedView({
             </button>
             <button
               onClick={async () => {
-                // Update overviewData state
-                updateOverview("rejected", status === "NEW APPLICATION");
 
-                // Update application state
-                let newApplicationData = { ...data, status: "REJECTED" };
-                updateData(newApplicationData, index);
+                // Only allow state change if reject button is not clicked
+                if (!activeRejectButton) {
+                  // Update overviewData state
+                  updateOverview("rejected", status === "NEW APPLICATION");
 
-                // Adjust state for accept/reject buttons
-                setActiveAcceptButton(false);
-                setActiveRejectButton(true);
+                  // Update application state
+                  let newApplicationData = { ...data, status: "REJECTED" };
+                  updateData(newApplicationData, index);
 
-                // Update database in the background after UI changes are made
-                try {
-                  await axios.put(`/api/admin/app/${id}/reject`);
-                } catch (err) {
-                  console.log(err);
+                  // Adjust state for accept/reject buttons
+                  setActiveAcceptButton(false);
+                  setActiveRejectButton(true);
+
+                  // Update database in the background after UI changes are made
+                  try {
+                    await axios.put(`/api/admin/app/${id}/reject`);
+                  } catch (err) {
+                    console.log(err);
+                  }
                 }
               }}
               type="submit"
               className={`w-full inline-flex items-center justify-center px-3 py-1 border border-transparent shadow-sm font-medium rounded-md text-white ${
-                activeRejectButton
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-gray-300 hover:bg-gray-400"
+                activeRejectButton ? "bg-red-600 hover:bg-red-700" : "bg-gray-300 hover:bg-gray-400"
               } focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
             >
               Reject
@@ -138,65 +134,37 @@ export default function DetailedView({
                 <div className="px-4 py-5 sm:px-6">
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Full Name
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.fullName}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">Full Name</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.fullName}</dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Location
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.location}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">Location</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.location}</dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        School
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.education.school}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">School</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.education.school}</dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Student Status
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.education.studentStatus}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">Student Status</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.education.studentStatus}</dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Major
-                      </dt>
+                      <dt className="text-sm font-medium text-gray-500">Major</dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         {data.education.universityMajor}
                       </dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Email
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.email}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">Email</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.email}</dd>
                     </div>
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Other Comments
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {data.otherComments}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">Other Comments</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{data.otherComments}</dd>
                     </div>
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Links
-                      </dt>
+                      <dt className="text-sm font-medium text-gray-500">Links</dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
                           <a
@@ -206,9 +174,7 @@ export default function DetailedView({
                           >
                             <div className="w-0 flex-1 flex items-center">
                               <IoDocumentTextOutline className="flex-shrink-0 h-5 w-5 text-gray-600" />
-                              <span className="ml-2 flex-1 w-0 truncate">
-                                Resume Link
-                              </span>
+                              <span className="ml-2 flex-1 w-0 truncate">Resume Link</span>
                             </div>
                             <div className="ml-4 flex-shrink-0">
                               <IoChevronForward className="ml-1 text-lg" />
@@ -221,9 +187,7 @@ export default function DetailedView({
                           >
                             <div className="w-0 flex-1 flex items-center">
                               <IoLogoLinkedin className="flex-shrink-0 h-5 w-5 text-gray-600" />
-                              <span className="ml-2 flex-1 w-0 truncate">
-                                Linkedin Profile
-                              </span>
+                              <span className="ml-2 flex-1 w-0 truncate">Linkedin Profile</span>
                             </div>
                             <div className="ml-4 flex-shrink-0">
                               <IoChevronForward className="ml-1 text-lg" />
@@ -252,15 +216,9 @@ export default function DetailedView({
               </div>
             </section>
           </div>
-          <section
-            aria-labelledby="timeline-title"
-            className="lg:col-start-3 lg:col-span-1"
-          >
+          <section aria-labelledby="timeline-title" className="lg:col-start-3 lg:col-span-1">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-              <h2
-                id="timeline-title"
-                className="text-lg font-medium text-gray-900"
-              >
+              <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
                 Open Questions
               </h2>
 
@@ -269,9 +227,7 @@ export default function DetailedView({
                   <dt className="text-sm font-medium text-gray-500">
                     {index + 1}. {response.question}
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {response.answer}
-                  </dd>
+                  <dd className="mt-1 text-sm text-gray-900">{response.answer}</dd>
                 </div>
               ))}
             </div>

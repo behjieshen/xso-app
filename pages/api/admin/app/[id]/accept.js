@@ -40,12 +40,12 @@ export default async function handler(req, res) {
           status: "ACCEPTED",
         }
       ).lean();
-      await res.status(200).send(data);
+      return res.status(200).send(data);
     } catch (err) {
       console.log(err);
-      res.status(400).send("Error");
+      return res.status(400).send("Error");
     }
   } else {
-    res.status(404).send("Error");
+    return res.status(404).send("Error");
   }
 }

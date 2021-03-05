@@ -12,6 +12,12 @@ export default function MainLayout({ children }) {
     Router.push(process.env.NEXTAUTH_URL + "login");
   }
 
+  const [tab, setTab] = useState("apps");
+
+  const clickTab = (e) => {
+    setTab(e.target.name);
+  };
+
   return (
     <>
       {session && (
@@ -25,12 +31,14 @@ export default function MainLayout({ children }) {
           />
           {/* <!-- Static sidebar for desktop --> */}
           <Sidebar
+            clickTab={clickTab}
+            tab={tab}
             image={session.user.image}
             name={session.user.name}
             sideBarVisible={sideBarVisible}
             setSideBarVisible={setSideBarVisible}
           />
-          {React.cloneElement(children, { setSideBarVisible })}
+          {React.cloneElement(children, { setSideBarVisible, tab })}
           {/* {children} */}
         </div>
       )}

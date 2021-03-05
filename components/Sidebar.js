@@ -3,9 +3,16 @@ import { Transition } from "@headlessui/react";
 import { signOut } from "next-auth/client";
 import { useCurrentUser } from "../hooks/index";
 import Link from "next/link";
-export default function Sidebar({ image, name, sideBarVisible, setSideBarVisible }) {
+export default function Sidebar({
+  clickTab,
+  tab,
+  image,
+  name,
+  sideBarVisible,
+  setSideBarVisible,
+}) {
   const [settingVisible, setSettingVisible] = useState(false);
-  const [_, { mutate }] = useCurrentUser();
+  const [user, { mutate }] = useCurrentUser();
   const onSignout = () => {
     mutate(null, false);
     signOut({ callbackUrl: process.env.NEXTAUTH_URL });
@@ -123,6 +130,7 @@ export default function Sidebar({ image, name, sideBarVisible, setSideBarVisible
                 </span>
               </button>
             </div>
+
             {/* <!--
             Dropdown panel, show/hide based on dropdown state.
 
@@ -146,29 +154,6 @@ export default function Sidebar({ image, name, sideBarVisible, setSideBarVisible
               aria-orientation="vertical"
               aria-labelledby="options-menu"
             >
-              {/* <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    View profile
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Settings
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    role="menuitem"
-                  >
-                    Notifications
-                  </a>
-                </div> */}
               <div className="py-1">
                 <a
                   onClick={() => onSignout()}
@@ -186,6 +171,63 @@ export default function Sidebar({ image, name, sideBarVisible, setSideBarVisible
           <nav className="px-3 mt-6">
             <div className="space-y-1">
               {/* <!-- Current: "bg-gray-200 text-gray-900", Default: "text-gray-700 hover:text-gray-900 hover:bg-gray-50" --> */}
+              <a
+                href="#"
+                onClick={clickTab}
+                name="apps"
+                className={`${
+                  tab == "apps"
+                    ? "bg-gray-200 text-gray-900"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                }  group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+              >
+                <svg
+                  className="text-gray-500 mr-3 h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+                Home
+              </a>
+
+              {user?.role == "ADMIN" && (
+                <a
+                  href="#"
+                  onClick={clickTab}
+                  name="whitelist"
+                  className={`${
+                    tab == "whitelist"
+                      ? "bg-gray-200 text-gray-900"
+                      : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  }  group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                >
+                  <svg
+                    className="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                    />
+                  </svg>
+                  Whitelist
+                </a>
+              )}
             </div>
           </nav>
         </div>

@@ -18,6 +18,19 @@ Duration of project: 28 Jan 2020 - Present
 
 Tech Stack: React.js, Next.js, Tailwind CSS, Firebase Cloud Storage, MongoDB, Vercel, NextAuthJS
 
+## Features
+
+#### Student:
+1. Form progress is saved for each user input using localStorage, except resume.
+2. Mobile responsive design for people who fills in form using phones.
+3. View completed application
+
+### Admin:
+1. Pagination view to handle large amount of applications
+2. Export to .csv function
+3. Whitelist and de-whitelist student to the learning platform
+4. View detailed application of student
+
 ## Install
 
 1. After cloning the repo, run 

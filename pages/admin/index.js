@@ -33,12 +33,13 @@ export default function Index({ tab }) {
   }
 
   // Retrieve applications data from API
-
+  console.log(tab);
   const { data: applicationsAPIData, error: applicationsError } = useSWR(
     tab == "apps"
       ? `/api/admin/app?page=${paginationPage}`
-      : `/api/admin/app/whitelist` /////CHANGE THIS TO PROPER API
+      : `/api/admin/app/whitelist?page=${paginationPage}`
   );
+  console.log("data: ", applicationsAPIData);
   const { data: overviewAPIData, error: overviewError } = useSWR(
     `/api/admin/app/overview-data`
   );
@@ -162,12 +163,12 @@ export default function Index({ tab }) {
             updateData={updateData}
             paginationData={paginationData}
           />
-          {tab == "apps" && (
+       
             <ApplicationsPaginations
               paginationData={paginationData}
               setPaginationPage={setPaginationPage}
             />
-          )}
+          
         </main>
       </div>
     );

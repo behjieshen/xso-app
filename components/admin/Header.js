@@ -1,5 +1,9 @@
 import axios from "axios";
 
+const addAll = async () => {
+  await axios.put("/api/admin/app/whitelist");
+};
+
 export default function Header() {
   return (
     <div className="border-b border-gray-200 px-4 py-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8">
@@ -10,15 +14,7 @@ export default function Header() {
       </div>
       <div className="mt-4 flex sm:mt-0 sm:ml-4">
         <button
-          onClick={() => {
-            /////CHANGE THIS TO PROPER API
-            axios.get("/api/admin/whitelist").then((response, err) => {
-              if (err) {
-                console.log(err);
-              }
-              console.log(response);
-            });
-          }}
+          onClick={addAll}
           className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Whitelist All Accepted Students
@@ -38,7 +34,7 @@ export default function Header() {
                   return;
                 }
 
-                // Store blob response data to download 
+                // Store blob response data to download
                 const url = window.URL.createObjectURL(
                   new Blob([response.data])
                 );

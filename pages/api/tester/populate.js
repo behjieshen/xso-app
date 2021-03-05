@@ -23,7 +23,7 @@ handler.get(async (req, res) => {
     "College Senior",
   ];
   let objArr = [];
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 5; i++) {
     let fakeObj = {
       fullName: faker.name.findName(),
       location: faker.address.country(),

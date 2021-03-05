@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import mongoosePaginate from 'mongoose-paginate-v2';
+import mongoosePaginate from "mongoose-paginate-v2";
 
 // ref link: https://forms.gle/yUjCGbLZwKrKdj698
 let applicationSchema = new mongoose.Schema({
@@ -32,6 +32,7 @@ let applicationSchema = new mongoose.Schema({
     enum: ["NEW APPLICATION", "ACCEPTED", "REJECTED"],
     default: "NEW APPLICATION",
   },
+  whitelist: { type: Boolean, default: false },
   image: String,
 });
 

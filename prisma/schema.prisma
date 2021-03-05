@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Module {
+  id Int @id @default(autoincrement())
+
+  name        String @unique
+  position    Int    @unique
+  description String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  links      ModuleLink[]
+  submodules Submodule[]
+}
+
+model ModuleLink {
+  id       Int  @id @default(autoincrement())
+  moduleId Int?
+
+  name     String
+  link     String
+  position Int
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  module Module? @relation(fields: [moduleId], references: [id])
+}
+
+model Submodule {
+  id           Int  @id @default(autoincrement())
+  moduleId     Int?
+  videoId      Int?
+  quizId       Int?
+  assignmentId Int?
+
+  name        String
+  position    Int
+  contentType ContentType
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  module     Module?     @relation(fields: [moduleId], references: [id])
+  video      Video?      @relation(fields: [videoId], references: [id])
+  assignment Assignment? @relation(fields: [assignmentId], references: [id])
+  quiz       Quiz?       @relation(fields: [quizId], references: [id])
+
+  progress StudentProgress[]
+}
+
+enum ContentType {
+  video
+  quiz
+  assignment
+}
+
+model Video {
+  id Int @id @default(autoincrement())
+
+  videoUrl String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  submodules Submodule[]
+}
+
+model Quiz {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  questions  QuizQuestion[]
+  submodules Submodule[]
+}
+
+model QuizQuestion {
+  id     Int  @id @default(autoincrement())
+  quizId Int?
+
+  position Int
+  prompt   String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  quiz Quiz? @relation(fields: [quizId], references: [id])
+
+  answers QuizAnswer[]
+}
+
+model QuizAnswer {
+  id         Int  @id @default(autoincrement())
+  questionId Int?
+
+  answer   String
+  position Int
+  correct  Boolean
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  question QuizQuestion? @relation(fields: [questionId], references: [id])
+}
+
+model Assignment {
+  id Int @id @default(autoincrement())
+
+  description String[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  submodules  Submodule[]
+  assignments StudentAssignment[]
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+
+  name    String
+  email   String @unique
+  picture String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  progress    StudentProgress[]
+  assignments StudentAssignment[]
+}
+
+model StudentProgress {
+  id          Int  @id @default(autoincrement())
+  studentId   Int?
+  submoduleId Int?
+
+  progress Progress @default(unfinished)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  student   Student?   @relation(fields: [studentId], references: [id])
+  submodule Submodule? @relation(fields: [submoduleId], references: [id])
+
+  @@unique(fields: [studentId, submoduleId], name: "progressSearchId")
+}
+
+enum Progress {
+  finished
+  unfinished
+}
+
+model StudentAssignment {
+  id           Int  @id @default(autoincrement())
+  studentId    Int?
+  assignmentId Int?
+
+  uploaded Boolean  @default(false)
+  links    String[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  student    Student?    @relation(fields: [studentId], references: [id])
+  assignment Assignment? @relation(fields: [assignmentId], references: [id])
+
+  @@unique(fields: [studentId, assignmentId], name: "assignmentSearchId")
+}
+
+model ApprovedEmail {
+  id Int @id @default(autoincrement())
+
+  email String @unique
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+}

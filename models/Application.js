@@ -35,6 +35,7 @@ let applicationSchema = new mongoose.Schema({
   image: String,
 });
 
+// Mongoose Pagination
 applicationSchema.plugin(mongoosePaginate);
 
 export default mongoose.models.Application ||

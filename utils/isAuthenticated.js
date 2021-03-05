@@ -5,7 +5,6 @@
  * @returns {boolean}
  */
 
-
 import { getSession } from "next-auth/client";
 export const isAuthenticated = async (req, role) => {
     const session = await getSession({ req });

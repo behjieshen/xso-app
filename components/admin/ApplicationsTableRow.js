@@ -33,6 +33,7 @@ export default function ApplicationsTableRow({
         setShowDetailView(true);
       }}
     >
+
       <td className="pl-6 py-3 px-2 text-sm text-gray-500 font-medium">
         {index + 1}
       </td>
@@ -48,7 +49,9 @@ export default function ApplicationsTableRow({
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">
         {universityMajor}
       </td>
+
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left flex">
+        {/* Accept Button */}
         <button
           onClick={async (e) => {
             // Prevent propagating click event to parent elements that will trigger detailed view
@@ -84,6 +87,7 @@ export default function ApplicationsTableRow({
         >
           Accept
         </button>
+        {/* Reject Button */}
         <button
           onClick={async (e) => {
             // Prevent propagating click event to parent elements that will trigger detailed view
@@ -120,6 +124,7 @@ export default function ApplicationsTableRow({
           Reject
         </button>
       </td>
+      {/* Right Arrow Icon */}
       <td className="pr-6 cursor-pointer">
         <div className="relative flex justify-end items-center text-xxs text-gray-400 font-medium">
           <svg

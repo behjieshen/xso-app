@@ -8,6 +8,7 @@
 import Application from "../../../../../models/Application";
 import dbConnect from "../../../../../utils/mongodb";
 import { isAuthenticated } from "../../../../../utils/isAuthenticated";
+import {removeWhiteList} from '../../../../../utils/whitelist';
 
 export default async function handler(req, res) {
   /**
@@ -38,8 +39,14 @@ export default async function handler(req, res) {
         { _id: id },
         {
           status: "REJECTED",
+          whitelist: false
         }
       ).lean();
+
+   
+
+      await removeWhiteList(data.email);
+
       return res.status(200).send(data);
     } catch (err) {
       console.log(err);

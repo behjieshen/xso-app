@@ -66,28 +66,19 @@ handler.put(async (req, res) => {
     return res.status(500).json({ error: "Not Authenticated" });
   }
 
-  const dbSession = await mongoose.startSession();
-
   try { 
-    await dbSession.startTransaction();
 
     let apps = await Application.find(
       { status: "ACCEPTED", whitelist: false }
     ).exec();
 
     await asyncForEach(apps, async (item) => {
-      await Application.findOneAndUpdate({_id: item._id}, {whitelist: true}).session(dbSession)
-      await addWhiteList(item.email)
+      await Application.findOneAndUpdate({_id: item._id}, {whitelist: true})
+      // await addWhiteList(item.email)
     });
-
-    // Complete transaction
-    await dbSession.commitTransaction();
-    dbSession.endSession();
 
     return res.status(200).json(apps);
   }catch(err){
-    await dbSession.abortTransaction();
-    dbSession.endSession();
     console.log(err);
 
     return res.status(400).send("An error has occured");

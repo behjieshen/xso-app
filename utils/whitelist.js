@@ -16,7 +16,7 @@ export async function addWhiteList(email) {
 
 export async function removeWhiteList(email) {
     let exists = await checkWhiteList(email)
-
+    let remove;
     if (exists) {
         remove = await prisma.approvedEmail.delete({
             where: {

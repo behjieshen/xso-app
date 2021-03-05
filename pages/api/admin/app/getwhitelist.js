@@ -9,6 +9,6 @@ export default async (req, res) => {
     
     let list = await getWhiteList(req.body.email)
 
-    res.status(200).send()
+    res.status(200).send(list)
   }
 }

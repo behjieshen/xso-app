@@ -14,6 +14,20 @@ export async function addWhiteList(email) {
     return approved
 }
 
+export async function removeWhiteList(email) {
+    let exists = await checkWhiteList(email)
+
+    if (exists) {
+        remove = await prisma.approvedEmail.delete({
+            where: {
+                email
+            }
+        })
+    }
+
+    return remove
+}
+
 export async function checkWhiteList(email) {
     let approved = await prisma.approvedEmail.findUnique({
         where: {
@@ -22,4 +36,10 @@ export async function checkWhiteList(email) {
     })
 
     return approved
+}
+
+export async function getWhiteList() {
+    let list = await prisma.approvedEmail.findMany()
+
+    return list
 }

@@ -1,5 +1,5 @@
 import { getSession } from 'next-auth/client'
-import {addWhiteList} from './../../../../utils/whitelist'
+import {addWhiteList} from '../../../../utils/whitelist'
 
 export default async (req, res) => {
   const session = await getSession({ req })
@@ -9,6 +9,6 @@ export default async (req, res) => {
     
     let approved = await addWhiteList(req.body.email)
 
-    res.status(200).send(progress)
+    res.status(200).send()
   }
 }

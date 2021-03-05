@@ -1,6 +1,8 @@
 import { getNestedValueInObject } from "../../utils/getNestedValueInObject";
 
 export default function Input({ formik, fieldName, displayName, required, children, type, saveFormData }) {
+
+  // Error message component
   const ErrorMessage = (field) => {
     let error = getNestedValueInObject(field, formik.errors);
     let touched = getNestedValueInObject(field, formik.touched);
@@ -15,6 +17,7 @@ export default function Input({ formik, fieldName, displayName, required, childr
     return null;
   };
 
+  // Generic customized input component that is part of Formik
   return (
     <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
       <label
@@ -27,10 +30,15 @@ export default function Input({ formik, fieldName, displayName, required, childr
         }`}
       >
         {displayName}
+
+        {/* Add "*" when it is required */}
         {typeof required !== "undefined" && required ? "*" : null}
+
+        {/* Pass children from the props if applicable */}
         {typeof children !== "undefined" ? children : null}
       </label>
       <div className="mt-1 sm:mt-0 sm:col-span-2">
+        {/* Display based on textarea or input */}
         {typeof type !== "undefined" && type === "textarea" ? (
           <textarea
             id={fieldName}
@@ -38,6 +46,8 @@ export default function Input({ formik, fieldName, displayName, required, childr
             rows="4"
             onChange={(e) => {
               formik.handleChange(e);
+
+              // Save current form data into localStorage
               saveFormData(fieldName, e.target.value);
             }}
             value={getNestedValueInObject(fieldName,formik.values)}
@@ -55,6 +65,8 @@ export default function Input({ formik, fieldName, displayName, required, childr
             id={fieldName}
             onChange={(e) => {
               formik.handleChange(e);
+
+              // Save current form data into localStorage
               saveFormData(fieldName, e.target.value);
             }}
             value={getNestedValueInObject(fieldName,formik.values)}

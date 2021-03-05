@@ -17,13 +17,18 @@ export default function Header() {
                 responseType: "blob",
               })
               .then((response, err) => {
+                // Return error if applicable
                 if (err) {
                   console.log(err);
                   return;
                 }
+
+                // Store blob response data to download 
                 const url = window.URL.createObjectURL(
                   new Blob([response.data])
                 );
+
+                // Create an "a" tag for file
                 const link = document.createElement("a");
                 link.href = url;
                 let fileName = response.headers["content-disposition"].split(
@@ -31,6 +36,8 @@ export default function Header() {
                 )[1];
                 link.setAttribute("download", fileName);
                 document.body.appendChild(link);
+
+                // Click on link to download csv
                 link.click();
               });
           }}

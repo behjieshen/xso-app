@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ErrorMessage, getIn, setNestedObjectValues, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useSession } from "next-auth/client";
 import { useEffect, useState } from "react";
 import { uploadFile } from "../utils/firebase";
@@ -9,10 +9,11 @@ import * as yup from "yup";
 import Input from "./form/Input";
 import isEmptyObject from "../utils/isEmptyObject";
 import { useRouter } from "next/router";
-import lodash from "lodash";
 
 export default function XSOForm() {
   const [resumeData, setResumeData] = useState(null);
+  const [session] = useSession();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     location: "",
@@ -39,28 +40,34 @@ export default function XSOForm() {
     otherComments: "",
   });
 
+  // Save form data into localstorage function
   const saveFormData = (key, value) => {
     let newFormData = {
       ...formData,
     };
+
     if (key.includes(".")) {
       _.set(newFormData, key, value);
     } else {
       newFormData[key] = value;
     }
+
     setFormData(newFormData);
+
     localStorage.setItem("formData", JSON.stringify(newFormData));
   };
 
+  // Update our formData state if there is existing formData stored in localStorage
   useEffect(() => {
     if (localStorage.getItem("formData") !== null) {
       setFormData(JSON.parse(localStorage.getItem("formData")));
     }
   }, [localStorage]);
 
-  const [session] = useSession();
-  const router = useRouter();
+  // Initialize final formData with user email and image url
   let initialValues = { email: session.user.email, image: session.user.image };
+
+  // Update initialValues if there are existing formData in localStorage
   if (localStorage.getItem("formData") !== null) {
     initialValues = {
       ...initialValues,
@@ -69,40 +76,44 @@ export default function XSOForm() {
   } else {
     initialValues = { ...initialValues, ...formData };
   }
+
+  // Initialize Formik
   const formik = useFormik({
+    // Extends validationSchema with resumeFile (file input), 
+    // as validationSchema only has resumeURL (uploaded file URL)
     validationSchema: applicationSchema.concat(
       yup.object({
         resumeFile: yup.mixed().required("*This field is required"),
       })
     ),
     initialValues,
-    // initialValues: {
-    //   ...(JSON.parse(localStorage.getItem("formData")) || formData),
-    //   email: session.user.email,
-    //   image: session.user.image,
-    // },
     onSubmit: async (values, { resetForm }) => {
+
+      // Get file extension and rename fileName as the applicant's fullname
       const fileExtension = `.${resumeData.name.split(".")[1]}`;
       const fileName = values.fullName.replace(/\s/g, "_") + fileExtension;
       let fileLink;
+
+      // Upload file to get uploaded file link
       try {
         fileLink = await uploadFile(resumeData, fileName);
       } catch (err) {
         console.log("Error");
       }
 
+      // Submit form data to backend
       if (fileLink !== null) {
         values["resumeURL"] = fileLink;
         try {
           let { data } = await axios.post("/api/app", values);
           localStorage.removeItem("formData");
-          console.log(data);
           router.push("/");
         } catch (err) {
           console.log(err);
         }
       }
 
+      // Reset form
       // await resetForm();
     },
   });

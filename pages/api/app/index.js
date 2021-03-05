@@ -123,35 +123,3 @@ export default async function handler(req, res) {
     res.status(404);
   }
 }
-
-// Test json data
-// {
-//   "fullName": "Jason",
-//   "email": "behjieshen@gmail.com",
-//   "location": "New York",
-//   "cohort": "Fall 2020",
-//   "education": {
-//       "school": "University of Washington",
-//       "studentStatus": "Freshman",
-//       "universityMajor": "Biology"
-//   },
-//   "openQuestions": [
-//       {
-//           "question": "Why are you looking to take a gap semester?",
-//           "answer": "For fun"
-//       },
-//       {
-//           "question": "What do you hope to gain from this program?",
-//           "answer": "To party"
-//       },
-//       {
-//           "question": "What would you hope to learn from a Xoogler mentor?",
-//           "answer": "How to party harder?"
-//       }
-//   ],
-//   "linkedinURL": "https://linkedin.com/",
-//   "resumeURL": "https://resume.com/",
-//   "youtubeIntroductionURL": "https://youtube.com/",
-//   "otherComments": "I love whales.",
-//   "status": "NEW APPLICATION"
-// }

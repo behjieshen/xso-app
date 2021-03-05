@@ -17,8 +17,12 @@ export default function ApplicationsTableRow({
     _id: id,
   } = application;
 
-  const [activeAcceptButton, setActiveAcceptButton] = useState(status === "ACCEPTED");
-  const [activeRejectButton, setActiveRejectButton] = useState(status === "REJECTED");
+  const [activeAcceptButton, setActiveAcceptButton] = useState(
+    status === "ACCEPTED"
+  );
+  const [activeRejectButton, setActiveRejectButton] = useState(
+    status === "REJECTED"
+  );
 
   return (
     <tr
@@ -29,12 +33,23 @@ export default function ApplicationsTableRow({
         setShowDetailView(true);
       }}
     >
-      {/* Numbering have to plus one due to zero-index */}
-      <td className="pl-6 py-3 px-2 text-sm text-gray-500 font-medium">{index + 1}</td>
-      <td className="py-3 px-2 text-sm text-gray-500 font-medium">{fullName}</td>
-      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">{school}</td>
-      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">{studentStatus}</td>
-      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">{universityMajor}</td>
+
+      <td className="pl-6 py-3 px-2 text-sm text-gray-500 font-medium">
+        {index + 1}
+      </td>
+      <td className="py-3 px-2 text-sm text-gray-500 font-medium">
+        {fullName}
+      </td>
+      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">
+        {school}
+      </td>
+      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">
+        {studentStatus}
+      </td>
+      <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left">
+        {universityMajor}
+      </td>
+
       <td className="py-3 px-2 text-sm text-gray-500 font-medium text-left flex">
         {/* Accept Button */}
         <button
@@ -65,7 +80,9 @@ export default function ApplicationsTableRow({
           }}
           type="submit"
           className={`w-full inline-flex items-center justify-center px-3 py-1 border border-transparent shadow-sm font-medium rounded-md text-white ${
-            activeAcceptButton ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 hover:bg-gray-400"
+            activeAcceptButton
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-gray-300 hover:bg-gray-400"
           } focus:outline-none sm:mt-0 sm:w-auto sm:text-sm`}
         >
           Accept
@@ -99,7 +116,9 @@ export default function ApplicationsTableRow({
           }}
           type="submit"
           className={`w-full inline-flex items-center justify-center px-3 py-1 border border-transparent shadow-sm font-medium rounded-md text-white ${
-            activeRejectButton ? "bg-red-600 hover:bg-red-700" : "bg-gray-300 hover:bg-gray-400"
+            activeRejectButton
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-300 hover:bg-gray-400"
           } focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
         >
           Reject
@@ -115,7 +134,12 @@ export default function ApplicationsTableRow({
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </div>
       </td>

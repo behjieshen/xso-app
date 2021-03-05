@@ -3,15 +3,15 @@ import useSWR from "swr";
 import ApplicationsTable from "../../components/admin/ApplicationsTable";
 import Header from "../../components/admin/Header";
 import MainLayout from "../../layout/MainLayout";
-import axios from "axios";
 import { useSession } from "next-auth/client";
 import Router from "next/router";
 import Loading from "../../components/utils/Loading";
 import DetailedView from "../../components/admin/DetailedView";
 import Overview from "../../components/admin/Overview";
 import ApplicationsPaginations from "../../components/admin/ApplicationsPagination";
+import WhitelistHeader from "../../components/admin/WhitelistHeader";
 
-export default function Index() {
+export default function Index({ tab }) {
   const [session, loading] = useSession();
   const [overviewData, setOverviewData] = useState(null);
   const [applicationsData, setApplicationsData] = useState([]);
@@ -33,10 +33,15 @@ export default function Index() {
   }
 
   // Retrieve applications data from API
+
   const { data: applicationsAPIData, error: applicationsError } = useSWR(
-    `/api/admin/app?page=${paginationPage}`
+    tab == "apps"
+      ? `/api/admin/app?page=${paginationPage}`
+      : `/api/admin/app/whitelist` /////CHANGE THIS TO PROPER API
   );
-  const { data: overviewAPIData, error: overviewError } = useSWR(`/api/admin/app/overview-data`);
+  const { data: overviewAPIData, error: overviewError } = useSWR(
+    `/api/admin/app/overview-data`
+  );
 
   useEffect(() => {
     if (typeof overviewAPIData !== "undefined") {
@@ -57,7 +62,10 @@ export default function Index() {
   if (!applicationsAPIData && overviewAPIData)
     return (
       <div className="flex flex-col w-0 flex-1">
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none" tabIndex="0">
+        <main
+          className="flex-1 relative z-0 overflow-y-auto focus:outline-none"
+          tabIndex="0"
+        >
           <Header />
           <Overview overviewData={overviewData} />
           <Loading small />
@@ -69,7 +77,8 @@ export default function Index() {
   // Update applicationsData state (to be passed as props)
   const updateData = (originalData, updatedApplication, index) => {
     let updatedData = originalData;
-    let nonPaginatedIndex = index - (paginationData.page - 1) * paginationData.limit;
+    let nonPaginatedIndex =
+      index - (paginationData.page - 1) * paginationData.limit;
     updatedData[nonPaginatedIndex] = updatedApplication;
     setApplicationsData(updatedData);
   };
@@ -113,7 +122,11 @@ export default function Index() {
   // 2. If request for detail view, show detailed application view
   // 3. Else display default admin overview and table page
 
-  if (!loading && session !== typeof "undefined" && session.dbUser.role !== "ADMIN") {
+  if (
+    !loading &&
+    session !== typeof "undefined" &&
+    session.dbUser.role !== "ADMIN"
+  ) {
     return <></>;
   } else if (showDetailView)
     return (
@@ -130,9 +143,17 @@ export default function Index() {
   else {
     return (
       <div className="flex flex-col w-0 flex-1">
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none" tabIndex="0">
-          <Header />
-          <Overview overviewData={overviewData} />
+        <main
+          className="flex-1 relative z-0 overflow-y-auto focus:outline-none"
+          tabIndex="0"
+        >
+          {tab == "apps" && (
+            <>
+              <Header />
+              <Overview overviewData={overviewData} />
+            </>
+          )}
+          {tab == "whitelist" && <WhitelistHeader />}
           <ApplicationsTable
             data={applicationsData}
             setDetailViewData={setDetailViewData}
@@ -141,10 +162,12 @@ export default function Index() {
             updateData={updateData}
             paginationData={paginationData}
           />
-          <ApplicationsPaginations
-            paginationData={paginationData}
-            setPaginationPage={setPaginationPage}
-          />
+          {tab == "apps" && (
+            <ApplicationsPaginations
+              paginationData={paginationData}
+              setPaginationPage={setPaginationPage}
+            />
+          )}
         </main>
       </div>
     );

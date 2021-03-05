@@ -1,4 +1,5 @@
 export default function OverviewStats({ data, title, subtitle, bgClass }) {
+  // Generic component for each overview stat
   return (
     <li className="relative col-span-1 flex shadow-sm rounded-md">
       <div

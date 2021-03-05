@@ -4,8 +4,10 @@ export default function ApplicationsPaginations({ paginationData, setPaginationP
       className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
       aria-label="Pagination"
     >
+      {/* Previous Pagination Button */}
       <button
         onClick={() => {
+          // Save current page in localStorage
           localStorage.setItem("adminApplicationsCurrPage", paginationData.page - 1);
           setPaginationPage(paginationData.page - 1);
         }}
@@ -27,6 +29,8 @@ export default function ApplicationsPaginations({ paginationData, setPaginationP
         </svg>
         Previous
       </button>
+
+      {/* Select Page Pagination Dropdown  */}
       <div className="block flex justify-center">
         <p className="text-sm text-gray-700">
           Page
@@ -35,11 +39,13 @@ export default function ApplicationsPaginations({ paginationData, setPaginationP
               parseInt(localStorage.getItem("adminApplicationsCurrPage")) || paginationData.page
             }
             onChange={(e) => {
+              // Save current page in localStorage
               localStorage.setItem("adminApplicationsCurrPage", e.target.value);
               setPaginationPage(e.target.value);
             }}
             className="mx-3 mt-1 pl-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
+            {/* List all pages as an option in dropdown */}
             {Array.from({ length: paginationData.totalPages }, (_, i) => i + 1).map((pageNum) => (
               <option key={pageNum} value={pageNum}>
                 {pageNum}
@@ -50,9 +56,12 @@ export default function ApplicationsPaginations({ paginationData, setPaginationP
           <span className="px-1">{paginationData.totalPages}</span>
         </p>
       </div>
+      
+      {/* Next Pagination Button */}
       <div className="flex justify-between sm:justify-end">
         <button
           onClick={() => {
+            // Save current page in localStorage
             localStorage.setItem("adminApplicationsCurrPage", paginationData.page + 1);
             setPaginationPage(paginationData.page + 1);
           }}

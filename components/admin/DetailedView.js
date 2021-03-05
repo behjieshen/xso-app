@@ -19,17 +19,12 @@ export default function DetailedView({
 }) {
   const [session, loading] = useSession();
 
-  if (!loading && !session) return <div>Error</div>;
+  if (!loading && !session) return <div>Error loading detailed view</div>;
 
   const [activeAcceptButton, setActiveAcceptButton] = useState(data.status === "ACCEPTED");
   const [activeRejectButton, setActiveRejectButton] = useState(data.status === "REJECTED");
 
   const { _id: id, status } = data;
-
-  // Scroll to top at table view
-  // useEffect(() => {
-  //   window.scrollTo(0, 0)
-  // }, [])
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-auto w-full">
@@ -37,13 +32,14 @@ export default function DetailedView({
         <span
           className="flex items-center font-medium text-base text-gray-600 lg:mx-8 mb-4 cursor-pointer"
           onClick={() => {
+            // Go back to table view
             setShowDetailView(false);
           }}
         >
           <IoChevronBackSharp className="h-5 w-5 mr-1" />
           Back
         </span>
-        {/* Page header */}
+        {/* Detailed view top row */}
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
           <div className="flex items-center space-x-5">
             <div className="flex-shrink-0">
@@ -60,6 +56,7 @@ export default function DetailedView({
             </div>
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+            {/* Accept Button */}
             <button
               onClick={async () => {
 
@@ -93,6 +90,7 @@ export default function DetailedView({
             >
               Accept
             </button>
+            {/* Reject Button */}
             <button
               onClick={async () => {
 
@@ -126,9 +124,9 @@ export default function DetailedView({
             </button>
           </div>
         </div>
-        <div className="mt-8 pb-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+        {/* Application Details */}
+        <div className="mt-8 pb-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">         
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            {/* Description list*/}
             <section aria-labelledby="applicant-information-title">
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6">
@@ -216,6 +214,7 @@ export default function DetailedView({
               </div>
             </section>
           </div>
+          {/* Open-ended Questions */}
           <section aria-labelledby="timeline-title" className="lg:col-start-3 lg:col-span-1">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
               <h2 id="timeline-title" className="text-lg font-medium text-gray-900">

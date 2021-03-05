@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useCurrentUser } from "../hooks/index";
 
+// Let user view completed application or proceed to form
+
 export default function Status() {
   const [user] = useCurrentUser();
   return (

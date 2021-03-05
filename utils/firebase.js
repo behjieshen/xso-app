@@ -14,6 +14,12 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
+/**
+ * @summary - Upload file using firebase
+ * @param {file} - File Object
+ * @param {string} - File Name
+ * @returns {string} - Uploaded file link
+ */
 export const uploadFile = async (file, fileName) => {
   const storageRef = await firebase.storage().ref().child(fileName);
   try {

@@ -37,4 +37,4 @@ export default function WhiteList() {
   }
 }
 
-Index.Layout = MainLayout;
+WhiteList.Layout = MainLayout;

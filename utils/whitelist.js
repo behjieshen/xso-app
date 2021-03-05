@@ -4,7 +4,7 @@ export async function addWhiteList(email) {
     let approved = await checkWhiteList(email)
 
     if (!approved) {
-        approved = await prisma.approvedemail.create({
+        approved = await prisma.approvedEmail.create({
             data: {
                 email
             }
@@ -15,7 +15,7 @@ export async function addWhiteList(email) {
 }
 
 export async function checkWhiteList(email) {
-    let approved = await prisma.approvedemail.findUnique({
+    let approved = await prisma.approvedEmail.findUnique({
         where: {
             email
         }

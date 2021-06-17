@@ -76,7 +76,7 @@ yarn dev
 
 ## Contributors:
 
-v1 (28 Jan 2020 - Present):
+v1 (28 Jan 2021 - 5 March 2021):
 
 - [Sirasorn Tichachol](https://github.com/SirasornT)
 - [Jason Beh](https://github.com/behjieshen)

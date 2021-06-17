@@ -14,7 +14,7 @@ XSO Applications is a project to ease the flow for future Xoogler School applica
 
 Link: [https://xso-app.vercel.app/](https://xso-app.vercel.app/)
 
-Duration of project: 28 Jan 2020 - Present
+Duration of project: 28 Jan 2021 - 5 March 2021
 
 Tech Stack: React.js, Next.js, Tailwind CSS, Firebase Cloud Storage, MongoDB, Vercel, NextAuthJS
 
